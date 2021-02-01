@@ -10,7 +10,6 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D myRigidbody;
     private Animator myAnimator;
     private BoxCollider2D myFeet;
-    
     private bool isGround;
     // Start is called before the first frame update
     void Start()
