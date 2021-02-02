@@ -6,12 +6,14 @@ public class PlayerController : MonoBehaviour
 {
     public float runSpeed = 10;
     public float jumpSpeed = 10;
+    public float doubleJumpSpeed = 10;
 
     private Rigidbody2D myRigidbody;
     private Animator myAnimator;
     private BoxCollider2D myFeet;
     
     private bool isGround;
+    private bool canDoubleJump;
     // Start is called before the first frame update
     void Start()
     {
@@ -69,6 +71,17 @@ public class PlayerController : MonoBehaviour
                 myAnimator.SetBool("Jump", true);
                 Vector2 jumpVel = new Vector2(0.0f, jumpSpeed);
                 myRigidbody.velocity = Vector2.up * jumpVel;
+                canDoubleJump = true;
+            }
+            else
+            {
+                if(canDoubleJump)
+                {
+                    myAnimator.SetBool("Jump", true);
+                    Vector2 doubleJumpVel = new Vector2(0.0f, doubleJumpSpeed);
+                    myRigidbody.velocity = Vector2.up * doubleJumpVel;
+                    canDoubleJump = false;
+                }
             }
         }
     }
