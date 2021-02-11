@@ -120,58 +120,57 @@ public class PlayerControl2 : MonoBehaviour
         if (isCanMove())
         {
             // 减速
-            if ((myVelocity.x > 0 && input.moveDir == -1) || (myVelocity.x < 0 && input.moveDir == 1) || input.moveDir == 0 ||
-				(isGround && input.v < 0) || Mathf.Abs(myVelocity.x) > MoveSpeed)
+            if (myVelocity.x != 0 && ((myVelocity.x > 0 && input.moveDir == -1) || (myVelocity.x < 0 && input.moveDir == 1)
+				|| input.moveDir == 0 || (isGround && input.v < 0) || Mathf.Abs(myVelocity.x) > MoveSpeed))
             {
                 int introDir = myVelocity.x > 0 ? 1 : -1;
-                float moveH = Mathf.Abs(myVelocity.x);
-				if(isGround)
+				if (isGround)
 				{
-					moveH -= MoveSpeed / 3;
+					if (Mathf.Abs(myVelocity.x) < MoveSpeed / 3)
+					{
+						myVelocity.x = 0;
+					}
+					else
+					{
+						myVelocity.x -= MoveSpeed / 3 * introDir;
+					}
 				}
 				else
 				{
-					moveH -= MoveSpeed / 6;
+					if (Mathf.Abs(myVelocity.x) < MoveSpeed / 6)
+					{
+						myVelocity.x = 0;
+					}
+					else
+					{
+						myVelocity.x -= MoveSpeed / 6 * introDir;
+					}
 				}
-				if (moveH < 0.01f)
-                {
-                    moveH = 0;
-                }
-                myVelocity.x = moveH * introDir;
+				Debug.Log(myVelocity.x);
             }
 			// 加速
 			else
 			{
 				//蹲下不允许移动
 				if (isGround && input.v < 0)
+				{
 					return;
-
-				if (input.moveDir == 1 && !(isGround && input.v < 0))
-				{
-					if (isGround)
-					{
-						myVelocity.x += MoveSpeed / 6;
-					}
-					else
-					{
-						myVelocity.x += MoveSpeed / 15;
-					}
-					if (myVelocity.x > MoveSpeed)
-						myVelocity.x = MoveSpeed;
-					// Debug.Log(myVelocity.x);
 				}
-				else if (input.moveDir == -1 && !(isGround && input.v < 0))
+				if (input.moveDir != 0 && !(isGround && input.v < 0))
 				{
 					if (isGround)
 					{
-						myVelocity.x -= MoveSpeed / 6;
+						myVelocity.x += MoveSpeed / 6 * input.moveDir;
 					}
 					else
 					{
-						myVelocity.x -= MoveSpeed / 12f;
+						myVelocity.x += MoveSpeed / 15 * input.moveDir;
 					}
-					if (myVelocity.x < -MoveSpeed)
-						myVelocity.x = -MoveSpeed;
+					if (myVelocity.x * input.moveDir > MoveSpeed)
+					{
+						myVelocity.x = MoveSpeed * input.moveDir;
+					}
+					// Debug.Log(myVelocity.x);
 				}
 			}
         }
