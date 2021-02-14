@@ -21,7 +21,9 @@ public class PlayerControl2 : MonoBehaviour
 	private RaycastHit2D leftBox;
 	private RaycastHit2D rightBox;
 	private BoxCollider2D myCollider;
-	public int groundLayerMask;
+	private Animator myAnimator;
+	private int groundLayerMask;
+	private int myFaceDir;
     public float MoveSpeed = 10f;
 	public float g = 20f;
 	private bool isGround { get { return downBox.collider != null ? true : false; } }
@@ -31,6 +33,7 @@ public class PlayerControl2 : MonoBehaviour
         input = InputManager2.Instance;
         myRigidbody2D = GetComponent<Rigidbody2D>();
 		myCollider = GetComponent<BoxCollider2D>();
+		myAnimator = GetComponent<Animator>();
 		groundLayerMask = LayerMask.GetMask("Ground");
     }
 
@@ -52,6 +55,7 @@ public class PlayerControl2 : MonoBehaviour
                 Fall();
                 break;
         }
+		SwitchAnimation();
     }
 
 	// 陆地状态
@@ -92,6 +96,36 @@ public class PlayerControl2 : MonoBehaviour
         upBox = Physics2D.BoxCast(transform.position, myCollider.size * 3, 0, Vector2.up, 0.1f, groundLayerMask);
         downBox = Physics2D.BoxCast(transform.position, myCollider.size * 3, 0, Vector2.down, 0.1f, groundLayerMask);
     }
+
+		void SwitchAnimation()
+	{
+		// Flip
+		if(transform.localScale.x * myVelocity.x < 0)
+		{
+			Vector3 newScale = transform.localScale;
+			newScale.x *= -1;
+			transform.localScale = newScale;
+		}
+		switch (playState)
+        {
+            case PlayState.Normal:
+				if(myVelocity.x == 0)
+				{
+					myAnimator.SetInteger("state", 0);
+				}
+                else
+				{
+					myAnimator.SetInteger("state", 1);
+				}
+                break;
+			case PlayState.Fall:
+                myAnimator.SetInteger("state", 2);
+                break;
+			case PlayState.Jump:
+                myAnimator.SetInteger("state", 3);
+                break;
+        }
+	}
 
 	// void OnDrawGizmos()
     // {
