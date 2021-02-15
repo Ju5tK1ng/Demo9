@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-enum PlayState
+public enum PlayState
 {
     Normal,
     Jump,
@@ -14,7 +14,7 @@ public class PlayerControl2 : MonoBehaviour
 {
     private InputManager2 input;
     public Vector3 myVelocity;
-	private PlayState playState;
+	public PlayState playState;
     private Rigidbody2D myRigidbody2D;
 	private RaycastHit2D downBox;
 	private RaycastHit2D upBox;
@@ -24,8 +24,12 @@ public class PlayerControl2 : MonoBehaviour
 	private Animator myAnimator;
 	private int groundLayerMask;
 	private int myFaceDir;
-    public float MoveSpeed = 10f;
-	public float g = 20f;
+	public int curFrame = 0;
+
+	// 常量
+    private const float MoveSpeed = 10f;
+	private const float g = 50f;
+	private const float JumpSpeed = 20f;
 	private bool isGround { get { return downBox.collider != null ? true : false; } }
 
     void Start()
@@ -39,6 +43,7 @@ public class PlayerControl2 : MonoBehaviour
 
     private void FixedUpdate()
     {
+		curFrame += 1;
         HorizontalMove();
         myRigidbody2D.MovePosition(transform.position + myVelocity * Time.fixedDeltaTime);
     }
@@ -46,20 +51,23 @@ public class PlayerControl2 : MonoBehaviour
     void Update()
     {
 		RayCastBox();
+		SwitchAnimation();
         switch (playState)
         {
             case PlayState.Normal:
-                Normal();
+                NormalState();
                 break;
             case PlayState.Fall:
-                Fall();
+                FallState();
+                break;
+			case PlayState.Jump:
+				JumpState();
                 break;
         }
-		SwitchAnimation();
     }
 
 	// 陆地状态
-	void Normal()
+	void NormalState()
 	{
 		if(!isGround)
 		{
@@ -67,13 +75,18 @@ public class PlayerControl2 : MonoBehaviour
 			return;
 		}
 		myVelocity.y = 0;
+		if(input.JumpKeyDown)
+		{
+			Jump();
+		}
 	}
 
 	// 落下状态
-	void Fall()
+	void FallState()
 	{
 		if(isGround)
 		{
+			// Debug.Log(frame);
 			playState = PlayState.Normal;
 			return;
 		}
@@ -82,6 +95,27 @@ public class PlayerControl2 : MonoBehaviour
 			myVelocity.y -= g * Time.deltaTime;
 			myVelocity.y = Mathf.Clamp(myVelocity.y, -200, 200);
 		}
+	}
+
+	void JumpState()
+	{
+		if(myVelocity.y <= 0)
+		{
+			playState = isGround ? PlayState.Normal : PlayState.Fall;
+		}
+		if(IsCanFall())
+		{
+			myVelocity.y -= g * Time.deltaTime;
+			myVelocity.y = Mathf.Clamp(myVelocity.y, -200, 200);
+		}
+	}
+
+	// 跳跃
+	void Jump()
+	{
+		// Debug.Log(frame);
+		playState = PlayState.Jump;
+		myVelocity.y = JumpSpeed;
 	}
 
 	bool IsCanFall()
@@ -180,7 +214,6 @@ public class PlayerControl2 : MonoBehaviour
 						myVelocity.x -= MoveSpeed / 6 * introDir;
 					}
 				}
-				Debug.Log(myVelocity.x);
             }
 			// 加速
 			else

@@ -5,13 +5,28 @@ using UnityEngine;
 public class InputManager2 : MonoBehaviour
 {
     public static InputManager2 Instance;
-    private PlayerControl2 myPlayerControl2;
     public bool keyIsSet;
     public KeyCode LeftMoveKey;
     public KeyCode RightMoveKey;
+    public KeyCode Jump;
+    public bool JumpKeyDown {
+        get
+        {
+            if(Input.GetKeyDown(Jump))
+            {
+				return true;
+            }
+            else if(jumpFrame > 0)
+            {
+				return true;
+            }
+            return false;
+        }
+    }
     public float v = 0;
     public float h = 0;
     public int moveDir;
+    public int jumpFrame;
     
     private void Awake()
     {
@@ -21,7 +36,6 @@ public class InputManager2 : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
-        myPlayerControl2 = GetComponent<PlayerControl2>();
         KeyInit();
     }
 
@@ -31,6 +45,7 @@ public class InputManager2 : MonoBehaviour
         {
             LeftMoveKey = KeyCode.LeftArrow;
             RightMoveKey = KeyCode.RightArrow;
+            Jump = KeyCode.C;
         }
     }
 
@@ -39,11 +54,23 @@ public class InputManager2 : MonoBehaviour
 
     }
 
+    private void FixedUpdate()
+    {
+        if(jumpFrame >= 0)
+        {
+            jumpFrame--;
+        }
+    }
+    
     private void Update()
     {
         CheckHorizontalMove();
         v = Input.GetAxisRaw("Vertical");
         h = Input.GetAxisRaw("Horizontal");
+        if (Input.GetKeyDown(Jump))
+        {
+            jumpFrame = 3;  // 缓存跳跃键3帧
+        }
     }
 
     private void CheckHorizontalMove()
