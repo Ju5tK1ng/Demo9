@@ -27,10 +27,34 @@ public class PlayerControl2 : MonoBehaviour
 	public int curFrame = 0;
 
 	// 常量
-    private const float MoveSpeed = 10f;
-	private const float g = 50f;
+    private const float MoveSpeed = 12f;
+	private const float G = 50f;
+	private const float MaxFall = 20f;
+	private const float MaxSlipSpeed = 4f;
 	private const float JumpSpeed = 20f;
+	private const float JumpHBoost = 8f;
+	private const float WallJumpHSpeed = MoveSpeed + JumpHBoost;
+
+	// 检测
 	private bool isGround { get { return downBox.collider != null ? true : false; } }
+	private int wallDir
+	{
+		get
+		{
+			if(rightBox.collider != null)
+			{
+				return 1;
+			}
+			else if(leftBox.collider != null)
+			{
+				return -1;
+			}
+			else
+			{
+				return 0;
+		}
+		}
+	}
 
     void Start()
     {
@@ -84,37 +108,76 @@ public class PlayerControl2 : MonoBehaviour
 	// 落下状态
 	void FallState()
 	{
+		if(input.JumpKeyDown)
+		{
+			if(wallDir != 0)
+			{
+				Jump(wallDir);
+			}
+		}
 		if(isGround)
 		{
 			// Debug.Log(frame);
 			playState = PlayState.Normal;
 			return;
 		}
+		Fall();
+	}
+
+	void Fall()
+	{
 		if(IsCanFall())
 		{
-			myVelocity.y -= g * Time.deltaTime;
-			myVelocity.y = Mathf.Clamp(myVelocity.y, -200, 200);
+			if(wallDir != 0 && wallDir == input.moveDir)
+			{
+				myVelocity.y -= G * Time.deltaTime;
+				myVelocity.y = Mathf.Clamp(myVelocity.y, -MaxSlipSpeed, MaxSlipSpeed);
+			}
+			else
+			{
+				myVelocity.y -= G * Time.deltaTime;
+				myVelocity.y = Mathf.Clamp(myVelocity.y, -MaxFall, MaxFall);
+			}
 		}
 	}
 
 	void JumpState()
 	{
+		if(input.JumpKeyDown)
+		{
+			if(wallDir != 0)
+			{
+				Jump(wallDir);
+			}
+		}
 		if(myVelocity.y <= 0)
 		{
 			playState = isGround ? PlayState.Normal : PlayState.Fall;
 		}
 		if(IsCanFall())
 		{
-			myVelocity.y -= g * Time.deltaTime;
-			myVelocity.y = Mathf.Clamp(myVelocity.y, -200, 200);
+			myVelocity.y -= G * Time.deltaTime;
+			myVelocity.y = Mathf.Clamp(myVelocity.y, -MaxFall, MaxFall);
 		}
 	}
 
 	// 跳跃
-	void Jump()
+	void Jump(int wallDir = 0)
 	{
 		// Debug.Log(frame);
 		playState = PlayState.Jump;
+		if(isGround)
+		{
+			myVelocity.x += JumpHBoost * input.moveDir;
+		}
+		else if(input.moveDir == 0 && wallDir != 0)
+		{
+			myVelocity.x = JumpHBoost * -wallDir;
+		}
+		else if(input.moveDir != 0 && wallDir != 0)
+		{
+			myVelocity.x = WallJumpHSpeed * -wallDir;
+		}
 		myVelocity.y = JumpSpeed;
 	}
 
@@ -131,7 +194,7 @@ public class PlayerControl2 : MonoBehaviour
         downBox = Physics2D.BoxCast(transform.position, myCollider.size * 3, 0, Vector2.down, 0.1f, groundLayerMask);
     }
 
-		void SwitchAnimation()
+	void SwitchAnimation()
 	{
 		// Flip
 		if(transform.localScale.x * myVelocity.x < 0)
@@ -194,17 +257,6 @@ public class PlayerControl2 : MonoBehaviour
                 int introDir = myVelocity.x > 0 ? 1 : -1;
 				if (isGround)
 				{
-					if (Mathf.Abs(myVelocity.x) < MoveSpeed / 3)
-					{
-						myVelocity.x = 0;
-					}
-					else
-					{
-						myVelocity.x -= MoveSpeed / 3 * introDir;
-					}
-				}
-				else
-				{
 					if (Mathf.Abs(myVelocity.x) < MoveSpeed / 6)
 					{
 						myVelocity.x = 0;
@@ -212,6 +264,17 @@ public class PlayerControl2 : MonoBehaviour
 					else
 					{
 						myVelocity.x -= MoveSpeed / 6 * introDir;
+					}
+				}
+				else
+				{
+					if (Mathf.Abs(myVelocity.x) < MoveSpeed / 12)
+					{
+						myVelocity.x = 0;
+					}
+					else
+					{
+						myVelocity.x -= MoveSpeed / 12 * introDir;
 					}
 				}
             }

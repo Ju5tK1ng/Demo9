@@ -14,10 +14,12 @@ public class InputManager2 : MonoBehaviour
         {
             if(Input.GetKeyDown(Jump))
             {
+                jumpFrame = 0;
 				return true;
             }
             else if(jumpFrame > 0)
             {
+                jumpFrame = 0;
 				return true;
             }
             return false;
@@ -56,12 +58,12 @@ public class InputManager2 : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(jumpFrame >= 0)
+        if(jumpFrame > 0)
         {
             jumpFrame--;
         }
     }
-    
+
     private void Update()
     {
         CheckHorizontalMove();
