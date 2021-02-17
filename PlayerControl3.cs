@@ -37,6 +37,7 @@ public class PlayerControl3 : MonoBehaviour
 	private const float JumpHBoost = 6f;
     private const float AirMult = 0.65f;
 	private const float WallJumpHSpeed = MaxRunSpeed + JumpHBoost;
+	private const float KickWallJumpHSpeed = WallJumpHSpeed + JumpHBoost;
 
 	// 检测
 	private bool onGround { get { return downBox.collider != null ? true : false; } }
@@ -70,10 +71,10 @@ public class PlayerControl3 : MonoBehaviour
 
     void Update()
     {
-		// curFrame += 1;
-		// curTime += Time.deltaTime;
-		// if (transform.position.x > 16.9 && transform.position.x < 17.1 || transform.position.x > -17.1 && transform.position.x < -16.9)
-		// 	Debug.Log(curFrame + " " + curTime + " " + transform.position.x);
+		curFrame += 1;
+		curTime += Time.deltaTime;
+		if (onGround)
+			Debug.Log(curFrame + " " + curTime + " " + transform.position.x);
 		RayCastBox();
 		SwitchAnimation();
         HorizontalMove();
@@ -172,7 +173,7 @@ public class PlayerControl3 : MonoBehaviour
 		}
 		else if (input.moveDir != 0 && wallDir != 0)
 		{
-			myVelocity.x = (WallJumpHSpeed + JumpHBoost) * -wallDir;
+			myVelocity.x = KickWallJumpHSpeed * -wallDir;
 		}
 		myVelocity.y = JumpSpeed;
 	}
