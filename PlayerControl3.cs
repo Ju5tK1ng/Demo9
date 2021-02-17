@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerControl2 : MonoBehaviour
+public class PlayerControl3 : MonoBehaviour
 {
-	public enum PlayState
+    public enum PlayState
     {
-		Normal,
-		Jump,
-		Dash,
-		Fall,
+        Normal,
+        Jump,
+        Dash,
+        Fall,
     }
-    private InputManager2 input;
+    private InputManager3 input;
     public Vector3 myVelocity;
 	public PlayState playState;
     private Rigidbody2D myRigidbody2D;
@@ -23,28 +23,32 @@ public class PlayerControl2 : MonoBehaviour
 	private Animator myAnimator;
 	private int groundLayerMask;
 	private int myFaceDir;
-	public int curFrame = 0;
+	private int curFrame = 0;
+	private float curTime = 0;
 
 	// 常量
-    private const float MoveSpeed = 12f;
-	private const float G = 50f;
-	private const float MaxFall = 20f;
-	private const float MaxSlipSpeed = 4f;
-	private const float JumpSpeed = 20f;
-	private const float JumpHBoost = 8f;
-	private const float WallJumpHSpeed = MoveSpeed + JumpHBoost;
+    private const float MaxRunSpeed = 13.5f;
+    private const float RunAccel = 150f;
+    private const float RunReduce = 60f;
+	private const float G = 100f;
+	private const float MaxFallSpeed = 32f;
+	private const float MaxSlipSpeed = 6f;
+	private const float JumpSpeed = 30f;
+	private const float JumpHBoost = 6f;
+    private const float AirMult = 0.65f;
+	private const float WallJumpHSpeed = MaxRunSpeed + JumpHBoost;
 
 	// 检测
-	private bool isGround { get { return downBox.collider != null ? true : false; } }
+	private bool onGround { get { return downBox.collider != null ? true : false; } }
 	private int wallDir
 	{
 		get
 		{
-			if(rightBox.collider != null)
+			if (rightBox.collider != null)
 			{
 				return 1;
 			}
-			else if(leftBox.collider != null)
+			else if (leftBox.collider != null)
 			{
 				return -1;
 			}
@@ -57,24 +61,23 @@ public class PlayerControl2 : MonoBehaviour
 
     void Start()
     {
-        input = InputManager2.Instance;
+        input = InputManager3.Instance;
         myRigidbody2D = GetComponent<Rigidbody2D>();
 		myCollider = GetComponent<BoxCollider2D>();
 		myAnimator = GetComponent<Animator>();
 		groundLayerMask = LayerMask.GetMask("Ground");
     }
 
-    private void FixedUpdate()
-    {
-		curFrame += 1;
-        HorizontalMove();
-        myRigidbody2D.MovePosition(transform.position + myVelocity * Time.fixedDeltaTime);
-    }
-
     void Update()
     {
+		// curFrame += 1;
+		// curTime += Time.deltaTime;
+		// if (transform.position.x > 16.9 && transform.position.x < 17.1 || transform.position.x > -17.1 && transform.position.x < -16.9)
+		// 	Debug.Log(curFrame + " " + curTime + " " + transform.position.x);
 		RayCastBox();
 		SwitchAnimation();
+        HorizontalMove();
+        myRigidbody2D.MovePosition(transform.position + myVelocity * Time.deltaTime);
         switch (playState)
         {
             case PlayState.Normal:
@@ -92,13 +95,13 @@ public class PlayerControl2 : MonoBehaviour
 	// 陆地状态
 	void NormalState()
 	{
-		if(!isGround)
+		if (!onGround)
 		{
 			playState = PlayState.Fall;
 			return;
 		}
 		myVelocity.y = 0;
-		if(input.JumpKeyDown)
+		if (input.JumpKeyDown)
 		{
 			Jump();
 		}
@@ -107,14 +110,14 @@ public class PlayerControl2 : MonoBehaviour
 	// 落下状态
 	void FallState()
 	{
-		if(input.JumpKeyDown)
+		if (input.JumpKeyDown)
 		{
-			if(wallDir != 0)
+			if (wallDir != 0)
 			{
 				Jump(wallDir);
 			}
 		}
-		if(isGround)
+		if (onGround)
 		{
 			// Debug.Log(frame);
 			playState = PlayState.Normal;
@@ -123,40 +126,34 @@ public class PlayerControl2 : MonoBehaviour
 		Fall();
 	}
 
-	void Fall()
-	{
-		if(IsCanFall())
-		{
-			if(wallDir != 0 && wallDir == input.moveDir)
-			{
-				myVelocity.y -= G * Time.deltaTime;
-				myVelocity.y = Mathf.Clamp(myVelocity.y, -MaxSlipSpeed, MaxSlipSpeed);
-			}
-			else
-			{
-				myVelocity.y -= G * Time.deltaTime;
-				myVelocity.y = Mathf.Clamp(myVelocity.y, -MaxFall, MaxFall);
-			}
-		}
-	}
-
 	void JumpState()
 	{
-		if(input.JumpKeyDown)
+		if (input.JumpKeyDown)
 		{
-			if(wallDir != 0)
+			if (wallDir != 0)
 			{
 				Jump(wallDir);
 			}
 		}
-		if(myVelocity.y <= 0)
+		if (myVelocity.y <= 0)
 		{
-			playState = isGround ? PlayState.Normal : PlayState.Fall;
+			playState = onGround ? PlayState.Normal : PlayState.Fall;
 		}
-		if(IsCanFall())
+		Fall();
+	}
+
+    	void Fall()
+	{
+		if (IsCanFall())
 		{
-			myVelocity.y -= G * Time.deltaTime;
-			myVelocity.y = Mathf.Clamp(myVelocity.y, -MaxFall, MaxFall);
+			if (wallDir != 0 && wallDir == input.moveDir)
+			{
+                myVelocity.y = Approach(myVelocity.y, -MaxSlipSpeed, G * Time.deltaTime);
+			}
+			else
+			{
+				myVelocity.y = Approach(myVelocity.y, -MaxFallSpeed, G * Time.deltaTime);
+			}
 		}
 	}
 
@@ -165,17 +162,17 @@ public class PlayerControl2 : MonoBehaviour
 	{
 		// Debug.Log(frame);
 		playState = PlayState.Jump;
-		if(isGround)
+		if (onGround)
 		{
 			myVelocity.x += JumpHBoost * input.moveDir;
 		}
-		else if(input.moveDir == 0 && wallDir != 0)
-		{
-			myVelocity.x = JumpHBoost * -wallDir;
-		}
-		else if(input.moveDir != 0 && wallDir != 0)
+		else if (input.moveDir == 0 && wallDir != 0)
 		{
 			myVelocity.x = WallJumpHSpeed * -wallDir;
+		}
+		else if (input.moveDir != 0 && wallDir != 0)
+		{
+			myVelocity.x = (WallJumpHSpeed + JumpHBoost) * -wallDir;
 		}
 		myVelocity.y = JumpSpeed;
 	}
@@ -193,10 +190,31 @@ public class PlayerControl2 : MonoBehaviour
         downBox = Physics2D.BoxCast(transform.position, myCollider.size * 3, 0, Vector2.down, 0.1f, groundLayerMask);
     }
 
+    float Approach(float curValue, float tarValue, float deltaValue)
+    {
+        if (curValue < tarValue)
+        {
+            curValue += deltaValue;
+            if (curValue > tarValue)
+            {
+                curValue = tarValue;
+            }
+        }
+        else if (curValue > tarValue)
+        {
+            curValue -= deltaValue;
+            if (curValue < tarValue)
+            {
+                curValue = tarValue;
+            }
+        }
+        return curValue;
+    }
+
 	void SwitchAnimation()
 	{
 		// Flip
-		if(transform.localScale.x * myVelocity.x < 0)
+		if (transform.localScale.x * myVelocity.x < 0)
 		{
 			Vector3 newScale = transform.localScale;
 			newScale.x *= -1;
@@ -205,7 +223,7 @@ public class PlayerControl2 : MonoBehaviour
 		switch (playState)
         {
             case PlayState.Normal:
-				if(myVelocity.x == 0)
+				if (myVelocity.x == 0)
 				{
 					myAnimator.SetInteger("state", 0);
 				}
@@ -247,62 +265,15 @@ public class PlayerControl2 : MonoBehaviour
 
     void HorizontalMove()
     {
+        // 蹲下暂未实现
         if (isCanMove())
         {
-            // 减速
-            if (myVelocity.x != 0 && ((myVelocity.x > 0 && input.moveDir == -1) || (myVelocity.x < 0 && input.moveDir == 1)
-				|| input.moveDir == 0 || (isGround && input.v < 0) || Mathf.Abs(myVelocity.x) > MoveSpeed))
-            {
-                int introDir = myVelocity.x > 0 ? 1 : -1;
-				if (isGround)
-				{
-					if (Mathf.Abs(myVelocity.x) < MoveSpeed / 6)
-					{
-						myVelocity.x = 0;
-					}
-					else
-					{
-						myVelocity.x -= MoveSpeed / 6 * introDir;
-					}
-				}
-				else
-				{
-					if (Mathf.Abs(myVelocity.x) < MoveSpeed / 12)
-					{
-						myVelocity.x = 0;
-					}
-					else
-					{
-						myVelocity.x -= MoveSpeed / 12 * introDir;
-					}
-				}
-            }
-			// 加速
-			else
-			{
-				//蹲下不允许移动
-				if (isGround && input.v < 0)
-				{
-					return;
-				}
-				if (input.moveDir != 0 && !(isGround && input.v < 0))
-				{
-					if (isGround)
-					{
-						myVelocity.x += MoveSpeed / 6 * input.moveDir;
-					}
-					else
-					{
-						myVelocity.x += MoveSpeed / 15 * input.moveDir;
-					}
-					if (myVelocity.x * input.moveDir > MoveSpeed)
-					{
-						myVelocity.x = MoveSpeed * input.moveDir;
-					}
-					// Debug.Log(myVelocity.x);
-				}
-			}
-        }
+            float mult = onGround ? 1 : AirMult;
+            if (Mathf.Abs(myVelocity.x) > MaxRunSpeed && Mathf.Sign(myVelocity.x) == input.moveDir)
+                myVelocity.x = Approach(myVelocity.x, MaxRunSpeed * input.moveDir, RunReduce * mult * Time.deltaTime);  //Reduce back from beyond the max speed
+            else
+                myVelocity.x = Approach(myVelocity.x, MaxRunSpeed * input.moveDir, RunAccel * mult * Time.deltaTime);   //Approach the max speed
+		}
     }
     bool isCanMove()
     {
