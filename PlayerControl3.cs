@@ -7,9 +7,9 @@ public class PlayerControl3 : MonoBehaviour
     public enum PlayState
     {
         Normal,
+		Fall,
         Jump,
         Dash,
-        Fall,
     }
     private InputManager3 input;
     public Vector3 myVelocity;
@@ -25,6 +25,9 @@ public class PlayerControl3 : MonoBehaviour
 	private int myFaceDir;
 	private int curFrame = 0;
 	private float curTime = 0;
+	private float dashes;
+	private float dashRemainingTime;
+	private float dashReaminingCooldown;
 
 	// 常量
     private const float MaxRunSpeed = 13.5f;
@@ -35,30 +38,14 @@ public class PlayerControl3 : MonoBehaviour
 	private const float MaxSlipSpeed = 6f;
 	private const float JumpSpeed = 30f;
 	private const float JumpHBoost = 6f;
+	private const float DashSpeed = 36f;
+	private const float EndDashSpeed = 24f;
+	private const float DashTime = 0.15f;
+	private const float DashCooldown = 0.2f;
     private const float AirMult = 0.65f;
 	private const float WallJumpHSpeed = MaxRunSpeed + JumpHBoost;
 	private const float KickWallJumpHSpeed = WallJumpHSpeed + JumpHBoost;
-
-	// 检测
-	private bool onGround { get { return downBox.collider != null ? true : false; } }
-	private int wallDir
-	{
-		get
-		{
-			if (rightBox.collider != null)
-			{
-				return 1;
-			}
-			else if (leftBox.collider != null)
-			{
-				return -1;
-			}
-			else
-			{
-				return 0;
-		}
-		}
-	}
+	
 
     void Start()
     {
@@ -73,12 +60,20 @@ public class PlayerControl3 : MonoBehaviour
     {
 		// curFrame += 1;
 		// curTime += Time.deltaTime;
-		// if (onGround)
+		// if (playState != PlayState.Dash)
 		// 	Debug.Log(curFrame + " " + curTime + " " + transform.position.x);
 		RayCastBox();
 		SwitchAnimation();
         HorizontalMove();
         myRigidbody2D.MovePosition(transform.position + myVelocity * Time.deltaTime);
+		if (dashReaminingCooldown > 0)
+		{
+			dashReaminingCooldown -= Time.deltaTime;
+		}
+		if (isCanDash)
+		{
+			Dash();
+		}
         switch (playState)
         {
             case PlayState.Normal:
@@ -90,9 +85,13 @@ public class PlayerControl3 : MonoBehaviour
 			case PlayState.Jump:
 				JumpState();
                 break;
+			case PlayState.Dash:
+				DashState();
+                break;
         }
     }
-
+	
+	# region 状态
 	// 陆地状态
 	void NormalState()
 	{
@@ -101,6 +100,7 @@ public class PlayerControl3 : MonoBehaviour
 			playState = PlayState.Fall;
 			return;
 		}
+		dashes = 1;
 		myVelocity.y = 0;
 		if (input.JumpKeyDown)
 		{
@@ -127,6 +127,7 @@ public class PlayerControl3 : MonoBehaviour
 		Fall();
 	}
 
+	// 跳跃状态
 	void JumpState()
 	{
 		if (input.JumpKeyDown)
@@ -143,9 +144,33 @@ public class PlayerControl3 : MonoBehaviour
 		Fall();
 	}
 
-    	void Fall()
+	// 冲刺状态
+	void DashState()
 	{
-		if (IsCanFall())
+		if(dashRemainingTime > 0)
+		{
+			dashRemainingTime -= Time.deltaTime;
+		}
+		else 
+		{
+			myVelocity.x = EndDashSpeed * Mathf.Sign(transform.localScale.x);
+			if(onGround)
+			{
+				playState = PlayState.Normal;
+			}
+			else
+			{
+				playState = PlayState.Fall;
+			}
+		}
+	}
+	# endregion
+
+	# region 动作
+	// 落下
+    void Fall()
+	{
+		if (IsCanFall)
 		{
 			if (wallDir != 0 && wallDir == input.moveDir)
 			{
@@ -178,10 +203,72 @@ public class PlayerControl3 : MonoBehaviour
 		myVelocity.y = JumpSpeed;
 	}
 
-	bool IsCanFall()
+	// 冲刺
+	void Dash()
 	{
-		return true;
+		dashes -= 1;
+		dashRemainingTime = DashTime;
+		dashReaminingCooldown = DashCooldown;
+		if(input.moveDir != 0)
+		{
+			myVelocity = Vector2.right * DashSpeed * input.moveDir;
+		}
+		else
+		{
+			myVelocity = Vector2.right * DashSpeed * Mathf.Sign(transform.localScale.x);
+		}
+		playState = PlayState.Dash;
 	}
+	#endregion
+
+	#region 检测
+	private bool onGround
+	{
+		get
+		{
+			return downBox.collider != null ? true : false; 
+		} 
+	}
+	private int wallDir
+	{
+		get
+		{
+			if (rightBox.collider != null)
+			{
+				return 1;
+			}
+			else if (leftBox.collider != null)
+			{
+				return -1;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+	}
+	bool isCanMove
+    {
+        get
+		{
+			return playState != PlayState.Dash;
+		}
+    }
+	bool IsCanFall
+	{
+		get
+		{
+			return playState != PlayState.Dash;
+		}
+	}
+	bool isCanDash
+	{
+		get
+		{
+			return input.DashKeyDown && dashReaminingCooldown <= 0 && dashes > 0;
+		}
+	}
+	#endregion
 	
 	void RayCastBox()
     {
@@ -239,6 +326,9 @@ public class PlayerControl3 : MonoBehaviour
 			case PlayState.Jump:
                 myAnimator.SetInteger("state", 3);
                 break;
+			case PlayState.Dash:
+                myAnimator.SetInteger("state", 4);
+                break;
         }
 	}
 
@@ -267,7 +357,7 @@ public class PlayerControl3 : MonoBehaviour
     void HorizontalMove()
     {
         // 蹲下暂未实现
-        if (isCanMove())
+        if (isCanMove)
         {
             float mult = onGround ? 1 : AirMult;
             if (Mathf.Abs(myVelocity.x) > MaxRunSpeed && Mathf.Sign(myVelocity.x) == input.moveDir)
@@ -275,9 +365,5 @@ public class PlayerControl3 : MonoBehaviour
             else
                 myVelocity.x = Approach(myVelocity.x, MaxRunSpeed * input.moveDir, RunAccel * mult * Time.deltaTime);   //Approach the max speed
 		}
-    }
-    bool isCanMove()
-    {
-        return true;
     }
 }

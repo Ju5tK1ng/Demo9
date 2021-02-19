@@ -9,6 +9,8 @@ public class InputManager3 : MonoBehaviour
     public KeyCode LeftMoveKey;
     public KeyCode RightMoveKey;
     public KeyCode Jump;
+    public KeyCode Dash;
+    public bool DashKeyDown { get { return Input.GetKeyDown(Dash); } }
     public bool JumpKeyDown {
         get
         {
@@ -48,6 +50,7 @@ public class InputManager3 : MonoBehaviour
             LeftMoveKey = KeyCode.LeftArrow;
             RightMoveKey = KeyCode.RightArrow;
             Jump = KeyCode.C;
+            Dash = KeyCode.Z;
         }
     }
 
