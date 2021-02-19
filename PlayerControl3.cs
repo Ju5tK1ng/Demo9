@@ -71,10 +71,10 @@ public class PlayerControl3 : MonoBehaviour
 
     void Update()
     {
-		curFrame += 1;
-		curTime += Time.deltaTime;
-		if (onGround)
-			Debug.Log(curFrame + " " + curTime + " " + transform.position.x);
+		// curFrame += 1;
+		// curTime += Time.deltaTime;
+		// if (onGround)
+		// 	Debug.Log(curFrame + " " + curTime + " " + transform.position.x);
 		RayCastBox();
 		SwitchAnimation();
         HorizontalMove();
