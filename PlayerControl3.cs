@@ -278,7 +278,7 @@ public class PlayerControl3 : MonoBehaviour
         downBox = Physics2D.BoxCast(transform.position, myCollider.size * 3, 0, Vector2.down, 0.1f, groundLayerMask);
     }
 
-    float Approach(float curValue, float tarValue, float deltaValue)
+    public static float Approach(float curValue, float tarValue, float deltaValue)
     {
         if (curValue < tarValue)
         {
