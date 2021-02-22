@@ -22,12 +22,14 @@ public class PlayerControl3 : MonoBehaviour
 	private BoxCollider2D myCollider;
 	private Animator myAnimator;
 	private int groundLayerMask;
-	private int myFaceDir;
 	private int curFrame = 0;
 	private float curTime = 0;
 	private float dashes;
 	private float dashRemainingTime;
 	private float dashReaminingCooldown;
+	private float skill1CoolDown = 1f;
+	private float skill1ReaminingCooldown;
+	public Transform prefabSkill1;
 
 	// 常量
     private const float MaxRunSpeed = 13.5f;
@@ -70,9 +72,17 @@ public class PlayerControl3 : MonoBehaviour
 		{
 			dashReaminingCooldown -= Time.deltaTime;
 		}
-		if (isCanDash)
+		if (skill1ReaminingCooldown > 0)
+		{
+			skill1ReaminingCooldown -= Time.deltaTime;
+		}
+		if (CanDash)
 		{
 			Dash();
+		}
+		if (CanSkill1)
+		{
+			Skill1();
 		}
         switch (playState)
         {
@@ -153,7 +163,7 @@ public class PlayerControl3 : MonoBehaviour
 		}
 		else 
 		{
-			myVelocity.x = EndDashSpeed * Mathf.Sign(transform.localScale.x);
+			myVelocity.x = EndDashSpeed * myFaceDir;
 			if(onGround)
 			{
 				playState = PlayState.Normal;
@@ -170,7 +180,7 @@ public class PlayerControl3 : MonoBehaviour
 	// 落下
     void Fall()
 	{
-		if (IsCanFall)
+		if (CanFall)
 		{
 			if (wallDir != 0 && wallDir == input.moveDir)
 			{
@@ -215,9 +225,16 @@ public class PlayerControl3 : MonoBehaviour
 		}
 		else
 		{
-			myVelocity = Vector2.right * DashSpeed * Mathf.Sign(transform.localScale.x);
+			myVelocity = Vector2.right * DashSpeed * myFaceDir;
 		}
 		playState = PlayState.Dash;
+	}
+
+	void Skill1()
+	{
+		skill1ReaminingCooldown = skill1CoolDown;
+		Transform skill1 = Instantiate(prefabSkill1, transform.position, Quaternion.identity);
+		skill1.rotation = Quaternion.Euler(0, 0, -myFaceDir * 90f + 90f);
 	}
 	#endregion
 
@@ -247,25 +264,39 @@ public class PlayerControl3 : MonoBehaviour
 			}
 		}
 	}
-	bool isCanMove
+	bool CanMove
     {
         get
 		{
 			return playState != PlayState.Dash;
 		}
     }
-	bool IsCanFall
+	bool CanFall
 	{
 		get
 		{
 			return playState != PlayState.Dash;
 		}
 	}
-	bool isCanDash
+	bool CanDash
 	{
 		get
 		{
 			return input.DashKeyDown && dashReaminingCooldown <= 0 && dashes > 0;
+		}
+	}
+	bool CanSkill1
+	{
+		get
+		{
+			return input.Skill1KeyDown && skill1ReaminingCooldown <= 0;
+		}
+	}
+	float myFaceDir
+	{
+		get
+		{
+			return Mathf.Sign(transform.localScale.x);
 		}
 	}
 	#endregion
@@ -302,7 +333,7 @@ public class PlayerControl3 : MonoBehaviour
 	void SwitchAnimation()
 	{
 		// Flip
-		if (transform.localScale.x * myVelocity.x < 0)
+		if (myFaceDir * myVelocity.x < 0)
 		{
 			Vector3 newScale = transform.localScale;
 			newScale.x *= -1;
@@ -357,7 +388,7 @@ public class PlayerControl3 : MonoBehaviour
     void HorizontalMove()
     {
         // 蹲下暂未实现
-        if (isCanMove)
+        if (CanMove)
         {
             float mult = onGround ? 1 : AirMult;
             if (Mathf.Abs(myVelocity.x) > MaxRunSpeed && Mathf.Sign(myVelocity.x) == input.moveDir)
