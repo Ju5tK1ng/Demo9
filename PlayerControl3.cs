@@ -28,6 +28,7 @@ public class PlayerControl3 : MonoBehaviour
 	private float varJumpTimer;
 	private float jumpGraceTimer;
     private float jumpBufferTimer;
+	private float wallSlideTimer;
 	private float dashes;
 	private float dashTimer;
 	private float dashCoolDownTimer;
@@ -42,7 +43,9 @@ public class PlayerControl3 : MonoBehaviour
 	private const float G = 135f;
 	// private const float HalfGThreshold = 6f;
 	private const float MaxFallSpeed = 24f;
-	private const float MaxSlipSpeed = 10f;
+	// private const float MaxSlipSpeed = 10f;
+	private const float WallSlideTime = 1.2f;
+	private const float WallSlideStartMax = 3f;
 	private const float JumpSpeed = 20f;
 	private const float VarJumpTime = 0.16f;
 	private const float JumpHBoost = 6f;
@@ -224,10 +227,13 @@ public class PlayerControl3 : MonoBehaviour
 			if (wallDir != 0 && wallDir == input.moveDir)
 			{
                 // myVelocity.y = Approach(myVelocity.y, -MaxSlipSpeed, G * mult * Time.deltaTime);
-				myVelocity.y = Approach(myVelocity.y, -MaxSlipSpeed, G * Time.deltaTime);
+				float maxWallSlideSpeed = Mathf.Lerp(MaxFallSpeed, WallSlideStartMax, wallSlideTimer / WallSlideTime);
+				myVelocity.y = Approach(myVelocity.y, -maxWallSlideSpeed, G * Time.deltaTime);
+				wallSlideTimer = Mathf.Max(wallSlideTimer - Time.deltaTime, 0);
 			}
 			else
 			{
+				wallSlideTimer = WallSlideTime;
 				// myVelocity.y = Approach(myVelocity.y, -MaxFallSpeed, G * mult * Time.deltaTime);
 				myVelocity.y = Approach(myVelocity.y, -MaxFallSpeed, G * Time.deltaTime);
 			}
@@ -240,6 +246,7 @@ public class PlayerControl3 : MonoBehaviour
 		// Debug.Log(frame);
 		varJumpTimer = VarJumpTime;
 		jumpBufferTimer = 0;
+		wallSlideTimer = WallSlideTime;
 		playState = PlayState.Jump;
 		if (onGround || jumpGraceTimer > 0)
 		{
