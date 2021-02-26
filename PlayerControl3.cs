@@ -19,12 +19,14 @@ public class PlayerControl3 : MonoBehaviour
 	private RaycastHit2D upBox;
 	private RaycastHit2D leftBox;
 	private RaycastHit2D rightBox;
+	private RaycastHit2D downEnemyBox;
 	private BoxCollider2D myCollider;
 	private Animator myAnimator;
 	private int groundLayerMask;
+	private int enemyLayerMask;
 	private int curFrame = 0;
 	private float curTime = 0;
-	private float airJumps;
+	public float airJumps;
 	private float varJumpTimer;
 	private float jumpGraceTimer;
     private float jumpBufferTimer;
@@ -35,6 +37,8 @@ public class PlayerControl3 : MonoBehaviour
 	private float skill1CoolDown = 1f;
 	private float skill1CoolDownTimer;
 	public Transform prefabSkill1;
+	private bool skill2 = true;
+	private float skill2Damage = 1f;
 
 	// 常量
     private const float MaxRunSpeed = 13.5f;
@@ -67,6 +71,7 @@ public class PlayerControl3 : MonoBehaviour
 		myCollider = GetComponent<BoxCollider2D>();
 		myAnimator = GetComponent<Animator>();
 		groundLayerMask = LayerMask.GetMask("Ground");
+		enemyLayerMask = LayerMask.GetMask("Enemy");
     }
 
     void Update()
@@ -165,7 +170,14 @@ public class PlayerControl3 : MonoBehaviour
 		{
 			Jump(wallDir);
 		}
-		if (onGround)
+		else if (onEnemy)
+		{
+			airJumps = 1;
+			dashes = 1;
+			downEnemyBox.collider.GetComponent<Enemy>().TakeDamage(skill2Damage);
+			Jump();
+		}
+		else if (onGround)
 		{
 			// Debug.Log(frame);
 			playState = PlayState.Normal;
@@ -248,7 +260,7 @@ public class PlayerControl3 : MonoBehaviour
 		jumpBufferTimer = 0;
 		wallSlideTimer = WallSlideTime;
 		playState = PlayState.Jump;
-		if (onGround || jumpGraceTimer > 0)
+		if (onGround || onEnemy || jumpGraceTimer > 0)
 		{
 			myVelocity.x += JumpHBoost * input.moveDir;
 		}
@@ -301,6 +313,13 @@ public class PlayerControl3 : MonoBehaviour
 			return downBox.collider != null ? true : false; 
 		} 
 	}
+	private bool onEnemy
+	{
+		get
+		{
+			return downEnemyBox.collider != null ? true : false;
+		}
+	}
 	private int wallDir
 	{
 		get
@@ -337,7 +356,7 @@ public class PlayerControl3 : MonoBehaviour
 	{
 		get
 		{
-			return (input.JumpKeyDown || jumpBufferTimer > 0) && playState != PlayState.Dash && (onGround || jumpGraceTimer > 0 || airJumps > 0);
+			return (input.JumpKeyDown || jumpBufferTimer > 0) && playState != PlayState.Dash && (onGround || jumpGraceTimer > 0 || airJumps > 0 && wallDir == 0);
 		}
 	}
 	bool CanWallJump
@@ -375,6 +394,7 @@ public class PlayerControl3 : MonoBehaviour
         leftBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.left, 0.1f, groundLayerMask);
         upBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.up, 0.1f, groundLayerMask);
         downBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.down, 0.1f, groundLayerMask);
+		downEnemyBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.down, 0.1f, enemyLayerMask);
     }
 	#endregion
 
