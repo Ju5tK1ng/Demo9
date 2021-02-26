@@ -24,22 +24,30 @@ public class PlayerControl3 : MonoBehaviour
 	private int groundLayerMask;
 	private int curFrame = 0;
 	private float curTime = 0;
+	private float airJumps;
+	private float varJumpTimer;
+	private float jumpGraceTimer;
+    private float jumpBufferTimer;
 	private float dashes;
-	private float dashRemainingTime;
-	private float dashReaminingCooldown;
+	private float dashTimer;
+	private float dashCoolDownTimer;
 	private float skill1CoolDown = 1f;
-	private float skill1ReaminingCooldown;
+	private float skill1CoolDownTimer;
 	public Transform prefabSkill1;
 
 	// 常量
     private const float MaxRunSpeed = 13.5f;
     private const float RunAccel = 150f;
     private const float RunReduce = 60f;
-	private const float G = 100f;
-	private const float MaxFallSpeed = 32f;
-	private const float MaxSlipSpeed = 6f;
-	private const float JumpSpeed = 30f;
+	private const float G = 135f;
+	private const float HalfGThreshold = 6f;
+	private const float MaxFallSpeed = 24f;
+	private const float MaxSlipSpeed = 10f;
+	private const float JumpSpeed = 16f;
+	private const float VarJumpTime = 0.2f;
 	private const float JumpHBoost = 6f;
+	private const float JumpGraceTime = 0.05f;
+	private const float JumpBufferTime = 0.1f;
 	private const float DashSpeed = 36f;
 	private const float EndDashSpeed = 24f;
 	private const float DashTime = 0.15f;
@@ -62,23 +70,22 @@ public class PlayerControl3 : MonoBehaviour
     {
 		// curFrame += 1;
 		// curTime += Time.deltaTime;
-		// if (playState != PlayState.Dash)
-		// 	Debug.Log(curFrame + " " + curTime + " " + transform.position.x);
+		// if (transform.position.y > 7.95 || transform.position.y < -8.95)
+		// if (transform.position.y > -5.2)
+		// if (onGround)
+		// 	Debug.Log(curFrame + " " + curTime + " " + transform.position.y);
 		RayCastBox();
 		SwitchAnimation();
         HorizontalMove();
         myRigidbody2D.MovePosition(transform.position + myVelocity * Time.deltaTime);
-		if (dashReaminingCooldown > 0)
-		{
-			dashReaminingCooldown -= Time.deltaTime;
-		}
-		if (skill1ReaminingCooldown > 0)
-		{
-			skill1ReaminingCooldown -= Time.deltaTime;
-		}
+		Timer();
 		if (CanDash)
 		{
 			Dash();
+		}
+		if (CanJump)
+		{
+			Jump();
 		}
 		if (CanSkill1)
 		{
@@ -100,6 +107,39 @@ public class PlayerControl3 : MonoBehaviour
                 break;
         }
     }
+
+	// 计时器
+	private void Timer()
+	{
+		if (dashCoolDownTimer > 0)
+		{
+			dashCoolDownTimer -= Time.deltaTime;
+		}
+		if (skill1CoolDownTimer > 0)
+		{
+			skill1CoolDownTimer -= Time.deltaTime;
+		}
+		if (varJumpTimer > 0)
+		{
+			varJumpTimer -= Time.deltaTime;
+		}
+		if (onGround)
+		{
+			jumpGraceTimer = JumpGraceTime;
+		}
+		else if (jumpGraceTimer > 0)
+		{
+			jumpGraceTimer -= Time.deltaTime;
+		}
+		if (input.JumpKeyDown)
+        {
+            jumpBufferTimer = JumpBufferTime;
+        }
+        else if (jumpBufferTimer > 0)
+        {
+            jumpBufferTimer -= Time.deltaTime;
+        }
+	}
 	
 	# region 状态
 	// 陆地状态
@@ -111,22 +151,16 @@ public class PlayerControl3 : MonoBehaviour
 			return;
 		}
 		dashes = 1;
+		airJumps = 1;
 		myVelocity.y = 0;
-		if (input.JumpKeyDown)
-		{
-			Jump();
-		}
 	}
 
 	// 落下状态
 	void FallState()
 	{
-		if (input.JumpKeyDown)
+		if (CanWallJump)
 		{
-			if (wallDir != 0)
-			{
-				Jump(wallDir);
-			}
+			Jump(wallDir);
 		}
 		if (onGround)
 		{
@@ -140,26 +174,26 @@ public class PlayerControl3 : MonoBehaviour
 	// 跳跃状态
 	void JumpState()
 	{
-		if (input.JumpKeyDown)
+		if (CanWallJump)
 		{
-			if (wallDir != 0)
-			{
-				Jump(wallDir);
-			}
+			Jump(wallDir);
 		}
 		if (myVelocity.y <= 0)
 		{
 			playState = onGround ? PlayState.Normal : PlayState.Fall;
 		}
-		Fall();
+		if (varJumpTimer <= 0 || !input.JumpKey)
+		{
+			Fall();
+		}
 	}
 
 	// 冲刺状态
 	void DashState()
 	{
-		if(dashRemainingTime > 0)
+		if(dashTimer > 0)
 		{
-			dashRemainingTime -= Time.deltaTime;
+			dashTimer -= Time.deltaTime;
 		}
 		else 
 		{
@@ -182,13 +216,14 @@ public class PlayerControl3 : MonoBehaviour
 	{
 		if (CanFall)
 		{
+			float mult = (Mathf.Abs(myVelocity.y) < HalfGThreshold && input.JumpKey) ? 0.5f : 1f;
 			if (wallDir != 0 && wallDir == input.moveDir)
 			{
-                myVelocity.y = Approach(myVelocity.y, -MaxSlipSpeed, G * Time.deltaTime);
+                myVelocity.y = Approach(myVelocity.y, -MaxSlipSpeed, G * mult * Time.deltaTime);
 			}
 			else
 			{
-				myVelocity.y = Approach(myVelocity.y, -MaxFallSpeed, G * Time.deltaTime);
+				myVelocity.y = Approach(myVelocity.y, -MaxFallSpeed, G * mult * Time.deltaTime);
 			}
 		}
 	}
@@ -197,10 +232,16 @@ public class PlayerControl3 : MonoBehaviour
 	void Jump(int wallDir = 0)
 	{
 		// Debug.Log(frame);
+		varJumpTimer = VarJumpTime;
+		jumpBufferTimer = 0;
 		playState = PlayState.Jump;
-		if (onGround)
+		if (onGround || jumpGraceTimer > 0)
 		{
 			myVelocity.x += JumpHBoost * input.moveDir;
+		}
+		else if (wallDir == 0)
+		{
+			airJumps -= 1;
 		}
 		else if (input.moveDir == 0 && wallDir != 0)
 		{
@@ -211,14 +252,15 @@ public class PlayerControl3 : MonoBehaviour
 			myVelocity.x = KickWallJumpHSpeed * -wallDir;
 		}
 		myVelocity.y = JumpSpeed;
+		jumpGraceTimer = 0;
 	}
 
 	// 冲刺
 	void Dash()
 	{
 		dashes -= 1;
-		dashRemainingTime = DashTime;
-		dashReaminingCooldown = DashCooldown;
+		dashTimer = DashTime;
+		dashCoolDownTimer = DashCooldown;
 		if(input.moveDir != 0)
 		{
 			myVelocity = Vector2.right * DashSpeed * input.moveDir;
@@ -232,7 +274,7 @@ public class PlayerControl3 : MonoBehaviour
 
 	void Skill1()
 	{
-		skill1ReaminingCooldown = skill1CoolDown;
+		skill1CoolDownTimer = skill1CoolDown;
 		Transform skill1 = Instantiate(prefabSkill1, transform.position, Quaternion.identity);
 		skill1.rotation = Quaternion.Euler(0, 0, -myFaceDir * 90f + 90f);
 	}
@@ -278,18 +320,32 @@ public class PlayerControl3 : MonoBehaviour
 			return playState != PlayState.Dash;
 		}
 	}
+	bool CanJump
+	{
+		get
+		{
+			return (input.JumpKeyDown || jumpBufferTimer > 0) && playState != PlayState.Dash && (onGround || jumpGraceTimer > 0 || airJumps > 0);
+		}
+	}
+	bool CanWallJump
+	{
+		get
+		{
+			return input.JumpKeyDown && wallDir != 0;
+		}
+	}
 	bool CanDash
 	{
 		get
 		{
-			return input.DashKeyDown && dashReaminingCooldown <= 0 && dashes > 0;
+			return input.DashKeyDown && dashCoolDownTimer <= 0 && dashes > 0;
 		}
 	}
 	bool CanSkill1
 	{
 		get
 		{
-			return input.Skill1KeyDown && skill1ReaminingCooldown <= 0;
+			return input.Skill1KeyDown && skill1CoolDownTimer <= 0;
 		}
 	}
 	float myFaceDir
@@ -299,15 +355,15 @@ public class PlayerControl3 : MonoBehaviour
 			return Mathf.Sign(transform.localScale.x);
 		}
 	}
-	#endregion
 	
 	void RayCastBox()
     {
-        rightBox = Physics2D.BoxCast(transform.position, myCollider.size * 3, 0, Vector2.right, 0.1f, groundLayerMask);
-        leftBox = Physics2D.BoxCast(transform.position, myCollider.size * 3, 0, Vector2.left, 0.1f, groundLayerMask);
-        upBox = Physics2D.BoxCast(transform.position, myCollider.size * 3, 0, Vector2.up, 0.1f, groundLayerMask);
-        downBox = Physics2D.BoxCast(transform.position, myCollider.size * 3, 0, Vector2.down, 0.1f, groundLayerMask);
+        rightBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.right, 0.1f, groundLayerMask);
+        leftBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.left, 0.1f, groundLayerMask);
+        upBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.up, 0.1f, groundLayerMask);
+        downBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.down, 0.1f, groundLayerMask);
     }
+	#endregion
 
     public static float Approach(float curValue, float tarValue, float deltaValue)
     {
@@ -373,7 +429,7 @@ public class PlayerControl3 : MonoBehaviour
     //         //Draw a Ray forward from GameObject toward the hit
     //         Gizmos.DrawRay(transform.position, transform.forward * 0.1f);
     //         //Draw a cube that extends to where the hit exists
-    //         Gizmos.DrawWireCube(transform.position + transform.forward * 0.1f, myCollider.size * 3);
+    //         Gizmos.DrawWireCube(transform.position + transform.forward * 0.1f, myCollider.size * 1);
     //     }
     //     //If there hasn't been a hit yet, draw the ray at the maximum distance
     //     else
@@ -381,7 +437,7 @@ public class PlayerControl3 : MonoBehaviour
     //         //Draw a Ray forward from GameObject toward the maximum distance
     //         Gizmos.DrawRay(transform.position, transform.forward * 0.1f);
     //         //Draw a cube at the maximum distance
-    //         Gizmos.DrawWireCube(transform.position + transform.forward * 0.1f, myCollider.size * 3);
+    //         Gizmos.DrawWireCube(transform.position + transform.forward * 0.1f, myCollider.size * 1);
     //     }
     // }
 

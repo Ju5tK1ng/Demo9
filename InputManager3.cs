@@ -13,26 +13,11 @@ public class InputManager3 : MonoBehaviour
     public KeyCode Skill1;
     public bool Skill1KeyDown { get { return Input.GetKeyDown(Skill1); } }
     public bool DashKeyDown { get { return Input.GetKeyDown(Dash); } }
-    public bool JumpKeyDown {
-        get
-        {
-            if(Input.GetKeyDown(Jump))
-            {
-                jumpFrame = 0;
-				return true;
-            }
-            else if(jumpFrame > 0)
-            {
-                jumpFrame = 0;
-				return true;
-            }
-            return false;
-        }
-    }
+    public bool JumpKeyDown { get{ return Input.GetKeyDown(Jump); } }
+    public bool JumpKey { get { return Input.GetKey(Jump); } }
     public float v = 0;
     public float h = 0;
     public int moveDir;
-    public int jumpFrame;
     
     private void Awake()
     {
@@ -62,23 +47,11 @@ public class InputManager3 : MonoBehaviour
 
     }
 
-    private void FixedUpdate()
-    {
-        if(jumpFrame > 0)
-        {
-            jumpFrame--;
-        }
-    }
-
     private void Update()
     {
         CheckHorizontalMove();
         v = Input.GetAxisRaw("Vertical");
         h = Input.GetAxisRaw("Horizontal");
-        if (Input.GetKeyDown(Jump))
-        {
-            jumpFrame = 3;  // 缓存跳跃键3帧
-        }
     }
 
     private void CheckHorizontalMove()
