@@ -40,11 +40,11 @@ public class PlayerControl3 : MonoBehaviour
     private const float RunAccel = 150f;
     private const float RunReduce = 60f;
 	private const float G = 135f;
-	private const float HalfGThreshold = 6f;
+	// private const float HalfGThreshold = 6f;
 	private const float MaxFallSpeed = 24f;
 	private const float MaxSlipSpeed = 10f;
-	private const float JumpSpeed = 16f;
-	private const float VarJumpTime = 0.2f;
+	private const float JumpSpeed = 20f;
+	private const float VarJumpTime = 0.16f;
 	private const float JumpHBoost = 6f;
 	private const float JumpGraceTime = 0.05f;
 	private const float JumpBufferTime = 0.1f;
@@ -70,8 +70,8 @@ public class PlayerControl3 : MonoBehaviour
     {
 		// curFrame += 1;
 		// curTime += Time.deltaTime;
-		// if (transform.position.y > 7.95 || transform.position.y < -8.95)
-		// if (transform.position.y > -5.2)
+		// if (transform.position.y > -5.05)
+		// 	Debug.Log(curFrame + " " + curTime + " " + transform.position.y);
 		// if (onGround)
 		// 	Debug.Log(curFrame + " " + curTime + " " + transform.position.y);
 		RayCastBox();
@@ -182,7 +182,11 @@ public class PlayerControl3 : MonoBehaviour
 		{
 			playState = onGround ? PlayState.Normal : PlayState.Fall;
 		}
-		if (varJumpTimer <= 0 || !input.JumpKey)
+		if (varJumpTimer > 0 && input.JumpKey)
+		{
+			myVelocity.y = JumpSpeed;
+		}
+		else
 		{
 			Fall();
 		}
@@ -216,14 +220,16 @@ public class PlayerControl3 : MonoBehaviour
 	{
 		if (CanFall)
 		{
-			float mult = (Mathf.Abs(myVelocity.y) < HalfGThreshold && input.JumpKey) ? 0.5f : 1f;
+			// float mult = (Mathf.Abs(myVelocity.y) < HalfGThreshold && input.JumpKey) ? 0.5f : 1f;
 			if (wallDir != 0 && wallDir == input.moveDir)
 			{
-                myVelocity.y = Approach(myVelocity.y, -MaxSlipSpeed, G * mult * Time.deltaTime);
+                // myVelocity.y = Approach(myVelocity.y, -MaxSlipSpeed, G * mult * Time.deltaTime);
+				myVelocity.y = Approach(myVelocity.y, -MaxSlipSpeed, G * Time.deltaTime);
 			}
 			else
 			{
-				myVelocity.y = Approach(myVelocity.y, -MaxFallSpeed, G * mult * Time.deltaTime);
+				// myVelocity.y = Approach(myVelocity.y, -MaxFallSpeed, G * mult * Time.deltaTime);
+				myVelocity.y = Approach(myVelocity.y, -MaxFallSpeed, G * Time.deltaTime);
 			}
 		}
 	}
