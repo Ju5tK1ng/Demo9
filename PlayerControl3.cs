@@ -39,18 +39,18 @@ public class PlayerControl3 : MonoBehaviour
 	public Transform prefabSkill1;
 	private bool skill2 = true;
 	private float skill2Damage = 1f;
+	private int skill3 = 1;
 
 	// 常量
     private const float MaxRunSpeed = 13.5f;
     private const float RunAccel = 150f;
     private const float RunReduce = 60f;
-	private const float G = 135f;
+	private float G;
 	// private const float HalfGThreshold = 6f;
-	private const float MaxFallSpeed = 24f;
-	// private const float MaxSlipSpeed = 10f;
+	private float MaxFallSpeed;
 	private const float WallSlideTime = 1.2f;
-	private const float WallSlideStartMax = 3f;
-	private const float JumpSpeed = 20f;
+	private float WallSlideStartMax;
+	private float JumpSpeed;
 	private const float VarJumpTime = 0.16f;
 	private const float JumpHBoost = 6f;
 	private const float JumpGraceTime = 0.05f;
@@ -72,6 +72,10 @@ public class PlayerControl3 : MonoBehaviour
 		myAnimator = GetComponent<Animator>();
 		groundLayerMask = LayerMask.GetMask("Ground");
 		enemyLayerMask = LayerMask.GetMask("Enemy");
+		G = 135f;
+		MaxFallSpeed = 24f;
+		WallSlideStartMax = 3f;
+		JumpSpeed = 20f;
     }
 
     void Update()
@@ -82,7 +86,7 @@ public class PlayerControl3 : MonoBehaviour
 		// 	Debug.Log(curFrame + " " + curTime + " " + transform.position.y);
 		// if (onGround)
 		// 	Debug.Log(curFrame + " " + curTime + " " + transform.position.y);
-		RayCastBox();
+		RayCastBox(skill3);
 		SwitchAnimation();
         HorizontalMove();
         myRigidbody2D.MovePosition(transform.position + myVelocity * Time.deltaTime);
@@ -98,6 +102,10 @@ public class PlayerControl3 : MonoBehaviour
 		if (CanSkill1)
 		{
 			Skill1();
+		}
+		if (CanSkill3)
+		{
+			Skill3();
 		}
         switch (playState)
         {
@@ -193,7 +201,7 @@ public class PlayerControl3 : MonoBehaviour
 		{
 			Jump(wallDir);
 		}
-		if (myVelocity.y <= 0)
+		if (myVelocity.y * skill3 <= 0)
 		{
 			playState = onGround ? PlayState.Normal : PlayState.Fall;
 		}
@@ -238,7 +246,6 @@ public class PlayerControl3 : MonoBehaviour
 			// float mult = (Mathf.Abs(myVelocity.y) < HalfGThreshold && input.JumpKey) ? 0.5f : 1f;
 			if (wallDir != 0 && wallDir == input.moveDir)
 			{
-                // myVelocity.y = Approach(myVelocity.y, -MaxSlipSpeed, G * mult * Time.deltaTime);
 				float maxWallSlideSpeed = Mathf.Lerp(MaxFallSpeed, WallSlideStartMax, wallSlideTimer / WallSlideTime);
 				myVelocity.y = Approach(myVelocity.y, -maxWallSlideSpeed, G * Time.deltaTime);
 				wallSlideTimer = Mathf.Max(wallSlideTimer - Time.deltaTime, 0);
@@ -246,7 +253,6 @@ public class PlayerControl3 : MonoBehaviour
 			else
 			{
 				wallSlideTimer = WallSlideTime;
-				// myVelocity.y = Approach(myVelocity.y, -MaxFallSpeed, G * mult * Time.deltaTime);
 				myVelocity.y = Approach(myVelocity.y, -MaxFallSpeed, G * Time.deltaTime);
 			}
 		}
@@ -302,6 +308,17 @@ public class PlayerControl3 : MonoBehaviour
 		skill1CoolDownTimer = skill1CoolDown;
 		Transform skill1 = Instantiate(prefabSkill1, transform.position, Quaternion.identity);
 		skill1.rotation = Quaternion.Euler(0, 0, -myFaceDir * 90f + 90f);
+	}
+
+	void Skill3()
+	{
+		skill3 = -skill3;
+		Vector3 scaleFlipY = transform.localScale;
+		scaleFlipY.y = -scaleFlipY.y;
+		transform.localScale = scaleFlipY;
+		MaxFallSpeed = -MaxFallSpeed;
+		WallSlideStartMax = -WallSlideStartMax;
+		JumpSpeed = -JumpSpeed;
 	}
 	#endregion
 
@@ -380,6 +397,13 @@ public class PlayerControl3 : MonoBehaviour
 			return input.Skill1KeyDown && skill1CoolDownTimer <= 0;
 		}
 	}
+	bool CanSkill3
+	{
+		get
+		{
+			return input.Skill3KeyDown;
+		}
+	}
 	float myFaceDir
 	{
 		get
@@ -388,13 +412,13 @@ public class PlayerControl3 : MonoBehaviour
 		}
 	}
 	
-	void RayCastBox()
+	void RayCastBox(int HDir)
     {
         rightBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.right, 0.1f, groundLayerMask);
         leftBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.left, 0.1f, groundLayerMask);
-        upBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.up, 0.1f, groundLayerMask);
-        downBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.down, 0.1f, groundLayerMask);
-		downEnemyBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.down, 0.1f, enemyLayerMask);
+        upBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.up * HDir, 0.1f, groundLayerMask);
+        downBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.down * HDir, 0.1f, groundLayerMask);
+		downEnemyBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.down * HDir, 0.1f, enemyLayerMask);
     }
 	#endregion
 
