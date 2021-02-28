@@ -26,7 +26,7 @@ public class PlayerControl3 : MonoBehaviour
 	private int enemyLayerMask;
 	private int curFrame = 0;
 	private float curTime = 0;
-	public float airJumps;
+	private float airJumps;
 	private float varJumpTimer;
 	private float jumpGraceTimer;
     private float jumpBufferTimer;
@@ -40,17 +40,20 @@ public class PlayerControl3 : MonoBehaviour
 	private bool skill2 = true;
 	private float skill2Damage = 1f;
 	private int skill3 = 1;
+	private bool skill4 = false;
+	public Transform prefabSkill4;
+	private Transform playerShadow;
 
 	// 常量
     private const float MaxRunSpeed = 13.5f;
     private const float RunAccel = 150f;
     private const float RunReduce = 60f;
-	private float G;
+	private float G = 135f;
 	// private const float HalfGThreshold = 6f;
-	private float MaxFallSpeed;
+	private float MaxFallSpeed = 24f;
 	private const float WallSlideTime = 1.2f;
-	private float WallSlideStartMax;
-	private float JumpSpeed;
+	private float WallSlideStartMax = 3f;
+	private float JumpSpeed = 20f;
 	private const float VarJumpTime = 0.16f;
 	private const float JumpHBoost = 6f;
 	private const float JumpGraceTime = 0.05f;
@@ -72,19 +75,15 @@ public class PlayerControl3 : MonoBehaviour
 		myAnimator = GetComponent<Animator>();
 		groundLayerMask = LayerMask.GetMask("Ground");
 		enemyLayerMask = LayerMask.GetMask("Enemy");
-		G = 135f;
-		MaxFallSpeed = 24f;
-		WallSlideStartMax = 3f;
-		JumpSpeed = 20f;
     }
 
     void Update()
     {
-		// curFrame += 1;
-		// curTime += Time.deltaTime;
+		curFrame += 1;
+		curTime += Time.deltaTime;
 		// if (transform.position.y > -5.05)
 		// 	Debug.Log(curFrame + " " + curTime + " " + transform.position.y);
-		// if (onGround)
+		// if (onEnemy)
 		// 	Debug.Log(curFrame + " " + curTime + " " + transform.position.y);
 		RayCastBox(skill3);
 		SwitchAnimation();
@@ -106,6 +105,10 @@ public class PlayerControl3 : MonoBehaviour
 		if (CanSkill3)
 		{
 			Skill3();
+		}
+		if (CanSkill4)
+		{
+			Skill4();
 		}
         switch (playState)
         {
@@ -178,7 +181,7 @@ public class PlayerControl3 : MonoBehaviour
 		{
 			Jump(wallDir);
 		}
-		else if (onEnemy)
+		else if (CanEnemyJump)
 		{
 			airJumps = 1;
 			dashes = 1;
@@ -205,7 +208,7 @@ public class PlayerControl3 : MonoBehaviour
 		{
 			playState = onGround ? PlayState.Normal : PlayState.Fall;
 		}
-		if (varJumpTimer > 0 && input.JumpKey)
+		if (varJumpTimer > 0 && input.JumpKey || varJumpTimer > 0.08f)
 		{
 			myVelocity.y = JumpSpeed;
 		}
@@ -320,6 +323,23 @@ public class PlayerControl3 : MonoBehaviour
 		WallSlideStartMax = -WallSlideStartMax;
 		JumpSpeed = -JumpSpeed;
 	}
+	void Skill4()
+	{
+		if (skill4 == false)
+		{
+			skill4 = true;
+			playerShadow = Instantiate(prefabSkill4, transform.position, Quaternion.identity);
+		}
+		else
+		{
+			Vector3 tPosition = transform.position;
+			transform.position = playerShadow.position;
+			playerShadow.position = tPosition;
+			Vector3 tLocalScale = transform.localScale;
+			transform.localScale = playerShadow.localScale;
+			playerShadow.localScale = tLocalScale;
+		}
+	}
 	#endregion
 
 	#region 检测
@@ -390,6 +410,13 @@ public class PlayerControl3 : MonoBehaviour
 			return input.DashKeyDown && dashCoolDownTimer <= 0 && dashes > 0;
 		}
 	}
+	bool CanEnemyJump
+	{
+		get
+		{
+			return onEnemy && skill2;
+		}
+	}
 	bool CanSkill1
 	{
 		get
@@ -402,6 +429,13 @@ public class PlayerControl3 : MonoBehaviour
 		get
 		{
 			return input.Skill3KeyDown;
+		}
+	}
+	bool CanSkill4
+	{
+		get
+		{
+			return input.Skill4KeyDown && skill3 == 1;
 		}
 	}
 	float myFaceDir

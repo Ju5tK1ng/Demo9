@@ -12,11 +12,13 @@ public class InputManager3 : MonoBehaviour
     public KeyCode Dash;
     public KeyCode Skill1;
     public KeyCode Skill3;
+    public KeyCode Skill4;
     public bool JumpKeyDown { get{ return Input.GetKeyDown(Jump); } }
     public bool JumpKey { get { return Input.GetKey(Jump); } }
     public bool DashKeyDown { get { return Input.GetKeyDown(Dash); } }
     public bool Skill1KeyDown { get { return Input.GetKeyDown(Skill1); } }
     public bool Skill3KeyDown { get { return Input.GetKeyDown(Skill3); } }
+    public bool Skill4KeyDown { get { return Input.GetKeyDown(Skill4); } }
     public float v = 0;
     public float h = 0;
     public int moveDir;
@@ -42,6 +44,7 @@ public class InputManager3 : MonoBehaviour
             Dash = KeyCode.Z;
             Skill1 = KeyCode.X;
             Skill3 = KeyCode.A;
+            Skill4 = KeyCode.S;
         }
     }
 
