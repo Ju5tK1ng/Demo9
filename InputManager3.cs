@@ -13,15 +13,17 @@ public class InputManager3 : MonoBehaviour
     public KeyCode Skill1;
     public KeyCode Skill3;
     public KeyCode Skill4;
+    public KeyCode Skill5;
     public bool JumpKeyDown { get{ return Input.GetKeyDown(Jump); } }
     public bool JumpKey { get { return Input.GetKey(Jump); } }
     public bool DashKeyDown { get { return Input.GetKeyDown(Dash); } }
     public bool Skill1KeyDown { get { return Input.GetKeyDown(Skill1); } }
     public bool Skill3KeyDown { get { return Input.GetKeyDown(Skill3); } }
     public bool Skill4KeyDown { get { return Input.GetKeyDown(Skill4); } }
+    public bool Skill5KeyDown { get { return Input.GetKeyDown(Skill5); } }
     public float v = 0;
     public float h = 0;
-    public int moveDir;
+    public float moveDir;
     
     private void Awake()
     {
@@ -45,6 +47,7 @@ public class InputManager3 : MonoBehaviour
             Skill1 = KeyCode.X;
             Skill3 = KeyCode.A;
             Skill4 = KeyCode.S;
+            Skill5 = KeyCode.D;
         }
     }
 
@@ -62,37 +65,49 @@ public class InputManager3 : MonoBehaviour
 
     private void CheckHorizontalMove()
     {
-		if (Input.GetKeyDown(RightMoveKey) && h <= 0)
+        if (v != 0)
+        {
+            moveDir = 0;
+        }
+		else if (Input.GetKeyDown(RightMoveKey) && h <= 0)
 		{
-				moveDir = 1;
+			moveDir = 1;
 		}
 		else if (Input.GetKeyDown(LeftMoveKey) && h >= 0)
 		{
 		
-				moveDir = -1;
+			moveDir = -1;
 		}
-		else if (Input.GetKeyUp(RightMoveKey))
-		{
-			if (Input.GetKey(LeftMoveKey))
-			{
-				moveDir = -1;
-			}
-			else
-			{
-				moveDir = 0;
-			}
-		}
-		else if (Input.GetKeyUp(LeftMoveKey))
-		{
-			if (Input.GetKey(RightMoveKey))
-			{
-				moveDir = 1;
-			}
-			else
-			{
-				moveDir = 0;
-			}
-		}
+        else if (Input.GetKey(LeftMoveKey) && Input.GetKey(RightMoveKey))
+        {
+        
+        }
+        else
+        {
+            moveDir = h;
+        }
+		// else if (Input.GetKeyUp(RightMoveKey))
+		// {
+		// 	if (Input.GetKey(LeftMoveKey))
+		// 	{
+		// 		moveDir = -1;
+		// 	}
+		// 	else
+		// 	{
+		// 		moveDir = 0;
+		// 	}
+		// }
+		// else if (Input.GetKeyUp(LeftMoveKey))
+		// {
+		// 	if (Input.GetKey(RightMoveKey))
+		// 	{
+		// 		moveDir = 1;
+		// 	}
+		// 	else
+		// 	{
+		// 		moveDir = 0;
+		// 	}
+		// }
 	}
 }
 

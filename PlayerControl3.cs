@@ -43,6 +43,7 @@ public class PlayerControl3 : MonoBehaviour
 	private bool skill4 = false;
 	public Transform prefabSkill4;
 	private Transform playerShadow;
+	public Transform prefabSkill5;
 
 	// 常量
     private const float MaxRunSpeed = 13.5f;
@@ -109,6 +110,10 @@ public class PlayerControl3 : MonoBehaviour
 		if (CanSkill4)
 		{
 			Skill4();
+		}
+		if (CanSkill5)
+		{
+			Skill5();
 		}
         switch (playState)
         {
@@ -340,6 +345,27 @@ public class PlayerControl3 : MonoBehaviour
 			playerShadow.localScale = tLocalScale;
 		}
 	}
+	void Skill5()
+	{
+		Vector3 tPosition = transform.position;
+		tPosition.y -= 0.3f;
+		if (input.h == 0 && input.v == 0)
+		{
+			tPosition.x += myFaceDir;
+		}
+		else if (input.h == 0 && input.v == 1)
+		{
+			tPosition.y += 2;
+		}
+		else
+		{
+			tPosition.x += input.h;
+			tPosition.y += input.v;
+		}
+		tPosition.x = Mathf.Round(tPosition.x + 0.5f) - 0.5f;
+		tPosition.y = Mathf.Round(tPosition.y + 0.5f) - 0.5f;
+		Transform skill5 = Instantiate(prefabSkill5, tPosition, Quaternion.identity);
+	}
 	#endregion
 
 	#region 检测
@@ -436,6 +462,13 @@ public class PlayerControl3 : MonoBehaviour
 		get
 		{
 			return input.Skill4KeyDown && skill3 == 1;
+		}
+	}
+	bool CanSkill5
+	{
+		get
+		{
+			return input.Skill5KeyDown;
 		}
 	}
 	float myFaceDir
