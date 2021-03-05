@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: b0ec98cc8ab56c5478a4b21733616ab4
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - sSprite: {fileID: 21300000, guid: d65edb8bd04241d45bbdc8bebbe3dcf2, type: 3}
+  - prefabFire1: {fileID: 6434180777603643912, guid: 8eb6c9614206a4740a03195dc564ba20, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

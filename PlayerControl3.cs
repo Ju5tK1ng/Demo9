@@ -34,9 +34,9 @@ public class PlayerControl3 : MonoBehaviour
 	private float dashes;
 	private float dashTimer;
 	private float dashCoolDownTimer;
-	private float skill1CoolDown = 1f;
-	private float skill1CoolDownTimer;
-	public Transform prefabSkill1;
+	// private float skill1CoolDown = 1f;
+	// private float skill1CoolDownTimer;
+	// public Transform prefabSkill1;
 	private bool skill2 = true;
 	private float skill2Damage = 1f;
 	private int skill3 = 1;
@@ -99,10 +99,10 @@ public class PlayerControl3 : MonoBehaviour
 		{
 			Jump();
 		}
-		if (CanSkill1)
-		{
-			Skill1();
-		}
+		// if (CanSkill1)
+		// {
+		// 	Skill1();
+		// }
 		if (CanSkill3)
 		{
 			Skill3();
@@ -139,10 +139,10 @@ public class PlayerControl3 : MonoBehaviour
 		{
 			dashCoolDownTimer -= Time.deltaTime;
 		}
-		if (skill1CoolDownTimer > 0)
-		{
-			skill1CoolDownTimer -= Time.deltaTime;
-		}
+		// if (skill1CoolDownTimer > 0)
+		// {
+		// 	skill1CoolDownTimer -= Time.deltaTime;
+		// }
 		if (varJumpTimer > 0)
 		{
 			varJumpTimer -= Time.deltaTime;
@@ -311,12 +311,12 @@ public class PlayerControl3 : MonoBehaviour
 		playState = PlayState.Dash;
 	}
 
-	void Skill1()
-	{
-		skill1CoolDownTimer = skill1CoolDown;
-		Transform skill1 = Instantiate(prefabSkill1, transform.position, Quaternion.identity);
-		skill1.rotation = Quaternion.Euler(0, 0, -myFaceDir * 90f + 90f);
-	}
+	// void Skill1()
+	// {
+	// 	skill1CoolDownTimer = skill1CoolDown;
+	// 	Transform skill1 = Instantiate(prefabSkill1, transform.position, Quaternion.identity);
+	// 	skill1.rotation = Quaternion.Euler(0, 0, -myFaceDir * 90f + 90f);
+	// }
 
 	void Skill3()
 	{
@@ -443,13 +443,13 @@ public class PlayerControl3 : MonoBehaviour
 			return onEnemy && skill2;
 		}
 	}
-	bool CanSkill1
-	{
-		get
-		{
-			return input.Skill1KeyDown && skill1CoolDownTimer <= 0;
-		}
-	}
+	// bool CanSkill1
+	// {
+	// 	get
+	// 	{
+	// 		return input.Skill1KeyDown && skill1CoolDownTimer <= 0;
+	// 	}
+	// }
 	bool CanSkill3
 	{
 		get
