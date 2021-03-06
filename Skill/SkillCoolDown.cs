@@ -13,8 +13,9 @@ public class SkillCoolDown : MonoBehaviour {
     private Image ButtonImage;
     // private AudioSource SkillSource;
     private float coolDownTime;
-    private float nextReadyTime;
     private float coolDownTimer;
+    private float nextReadyTime;
+    public bool coolDownComplete;
 
 
     void Start () 
@@ -34,7 +35,7 @@ public class SkillCoolDown : MonoBehaviour {
 
     void Update () 
     {
-        bool coolDownComplete = (Time.time > nextReadyTime);
+        coolDownComplete = (Time.time > nextReadyTime);
         if (coolDownComplete) 
         {
             SkillReady ();
