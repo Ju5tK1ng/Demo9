@@ -10,7 +10,7 @@ public class SkillCoolDown : MonoBehaviour {
     public Text coolDownText;
     public Skill skill;
     // [SerializeField] private GameObject player;
-    private Image ButtonImage;
+    private Image skillIcon;
     // private AudioSource SkillSource;
     private float coolDownTime;
     private float coolDownTimer;
@@ -25,11 +25,10 @@ public class SkillCoolDown : MonoBehaviour {
 
     public void Initialize()
     {
-        ButtonImage = GetComponent<Image>();
+        skillIcon = GetComponent<Image>();
         // SkillSource = GetComponent<AudioSource> ();
-        ButtonImage.sprite = skill.sSprite;
+        skillIcon.sprite = skill.sSprite;
         coolDownTime = skill.sCoolDown;
-        skill.Initialize ();
         SkillReady ();
     }
 

@@ -10,14 +10,15 @@ public class InputManager3 : MonoBehaviour
     public KeyCode RightMoveKey;
     public KeyCode Jump;
     public KeyCode Dash;
-    public KeyCode Skill1;
+    public KeyCode SkillTreeKey;
+    public Canvas skillTree;
+    private bool seeSkillTree;
     public KeyCode Skill3;
     public KeyCode Skill4;
     public KeyCode Skill5;
     public bool JumpKeyDown { get{ return Input.GetKeyDown(Jump); } }
     public bool JumpKey { get { return Input.GetKey(Jump); } }
     public bool DashKeyDown { get { return Input.GetKeyDown(Dash); } }
-    public bool Skill1KeyDown { get { return Input.GetKeyDown(Skill1); } }
     public bool Skill3KeyDown { get { return Input.GetKeyDown(Skill3); } }
     public bool Skill4KeyDown { get { return Input.GetKeyDown(Skill4); } }
     public bool Skill5KeyDown { get { return Input.GetKeyDown(Skill5); } }
@@ -44,7 +45,7 @@ public class InputManager3 : MonoBehaviour
             RightMoveKey = KeyCode.RightArrow;
             Jump = KeyCode.C;
             Dash = KeyCode.Z;
-            Skill1 = KeyCode.X;
+            SkillTreeKey = KeyCode.Tab;
             Skill3 = KeyCode.A;
             Skill4 = KeyCode.S;
             Skill5 = KeyCode.D;
@@ -61,6 +62,14 @@ public class InputManager3 : MonoBehaviour
         CheckHorizontalMove();
         v = Input.GetAxisRaw("Vertical");
         h = Input.GetAxisRaw("Horizontal");
+        if (Input.GetKeyDown(SkillTreeKey))
+        {
+            if(skillTree)
+            {
+                seeSkillTree = !seeSkillTree;
+                skillTree.gameObject.SetActive(seeSkillTree);
+            }
+        }
     }
 
     private void CheckHorizontalMove()

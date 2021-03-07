@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerControl3 : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class PlayerControl3 : MonoBehaviour
     private InputManager3 input;
     public Vector3 myVelocity;
 	public PlayState playState;
+	public Text SPText;
     private Rigidbody2D myRigidbody2D;
 	private RaycastHit2D downBox;
 	private RaycastHit2D upBox;
@@ -44,6 +46,34 @@ public class PlayerControl3 : MonoBehaviour
 	public Transform prefabSkill4;
 	private Transform playerShadow;
 	public Transform prefabSkill5;
+
+	//属性
+	private int myLevel;
+	public int MyLevel
+	{
+		get
+		{
+			return myLevel;
+		}
+		set
+		{
+			myLevel = value;
+			AttributeChange(0);
+		}
+	}
+	private int mySP;
+	public int MySP
+	{
+		get
+		{
+			return mySP;
+		}
+		set
+		{
+			mySP = value;
+			AttributeChange(1);
+		}
+	}
 
 	// 常量
     private const float MaxRunSpeed = 13.5f;
@@ -76,6 +106,7 @@ public class PlayerControl3 : MonoBehaviour
 		myAnimator = GetComponent<Animator>();
 		groundLayerMask = LayerMask.GetMask("Ground");
 		enemyLayerMask = LayerMask.GetMask("Enemy");
+		AttributeInitialize();
     }
 
     void Update()
@@ -365,6 +396,30 @@ public class PlayerControl3 : MonoBehaviour
 		tPosition.x = Mathf.Round(tPosition.x + 0.5f) - 0.5f;
 		tPosition.y = Mathf.Round(tPosition.y + 0.5f) - 0.5f;
 		Transform skill5 = Instantiate(prefabSkill5, tPosition, Quaternion.identity);
+	}
+	#endregion
+
+	#region 属性
+	private void AttributeInitialize()
+	{
+		SPText.text = "SP:" + MySP.ToString();
+	}
+	private void AttributeChange(int i)
+	{
+		switch(i)
+		{
+			case 0:
+			break;
+			case 1:
+			SPText.text = "SP:" + MySP.ToString();
+			// Debug.Log(MySP);
+			break;
+		}
+	}
+	public void LevelUp()
+	{
+		MyLevel += 1;
+		MySP += 1;
 	}
 	#endregion
 
