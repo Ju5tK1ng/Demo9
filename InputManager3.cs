@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InputManager3 : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class InputManager3 : MonoBehaviour
     public KeyCode Dash;
     public KeyCode SkillTreeKey;
     public Canvas skillTree;
+    public Image dash;
     private bool seeSkillTree;
     public KeyCode Skill3;
     public KeyCode Skill4;
@@ -50,6 +52,7 @@ public class InputManager3 : MonoBehaviour
             Skill4 = KeyCode.S;
             Skill5 = KeyCode.D;
         }
+        dash.GetComponent<SkillCoolDown>().skillButton = Dash;
     }
 
     void Start()
