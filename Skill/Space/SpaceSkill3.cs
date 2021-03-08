@@ -30,7 +30,7 @@ public class SpaceSkill3 : Skill
 			skillTime = 1;
 			playerShadow = Instantiate(prefabShadow, playerTransform.position, Quaternion.identity);
 		}
-		else
+		else if (skillTime == 1)
 		{
 			Vector3 tPosition = playerTransform.position;
 			playerTransform.position = playerShadow.position;
@@ -46,6 +46,11 @@ public class SpaceSkill3 : Skill
             }
 			playerShadow.localScale = tLocalScale;
 		}
+        else
+        {
+            Destroy(playerShadow.gameObject);
+            skillTime = 0;
+        }
     }
     
     // 检测能否学习技能

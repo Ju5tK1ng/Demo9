@@ -23,7 +23,7 @@ public class DestroyTile : MonoBehaviour
     {
         Vector3 tilePosition = tilemapCollider2D.ClosestPoint(position);
         tilePositionInt = tilemap.WorldToCell(tilePosition);
-        Invoke("DestroyLater", 0.1f);
+        Invoke("DestroyLater", 0.05f);
     }
     
     void DestroyLater()

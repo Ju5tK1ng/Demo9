@@ -39,7 +39,8 @@ public class PlayerControl3 : MonoBehaviour
 	public bool spaceSkill1 = false;
 	public float spaceSkill1Damage = 0f;
 	public int earthSkill3 = 1;
-	public Transform prefabSkill5;
+	public float v;
+	public float h;
 
 	//属性
 	private int myLevel;
@@ -111,6 +112,8 @@ public class PlayerControl3 : MonoBehaviour
 		// 	Debug.Log(curFrame + " " + curTime + " " + transform.position.y);
 		// if (onEnemy)
 		// 	Debug.Log(curFrame + " " + curTime + " " + transform.position.y);
+		v = input.v;
+		h = input.h;
 		RayCastBox(earthSkill3);
 		SwitchAnimation();
         HorizontalMove();
@@ -123,10 +126,6 @@ public class PlayerControl3 : MonoBehaviour
 		if (CanJump)
 		{
 			Jump();
-		}
-		if (CanSkill5)
-		{
-			Skill5();
 		}
         switch (playState)
         {
@@ -333,28 +332,6 @@ public class PlayerControl3 : MonoBehaviour
 		WallSlideStartMax = -WallSlideStartMax;
 		JumpSpeed = -JumpSpeed;
 	}
-
-	void Skill5()
-	{
-		Vector3 tPosition = transform.position;
-		tPosition.y -= 0.3f;
-		if (input.h == 0 && input.v == 0)
-		{
-			tPosition.x += myFaceDir;
-		}
-		else if (input.h == 0 && input.v == 1)
-		{
-			tPosition.y += 2;
-		}
-		else
-		{
-			tPosition.x += input.h;
-			tPosition.y += input.v;
-		}
-		tPosition.x = Mathf.Round(tPosition.x + 0.5f) - 0.5f;
-		tPosition.y = Mathf.Round(tPosition.y + 0.5f) - 0.5f;
-		Transform skill5 = Instantiate(prefabSkill5, tPosition, Quaternion.identity);
-	}
 	#endregion
 
 	#region 属性
@@ -454,20 +431,6 @@ public class PlayerControl3 : MonoBehaviour
 		get
 		{
 			return onEnemy;
-		}
-	}
-	// bool CanSkill4
-	// {
-	// 	get
-	// 	{
-	// 		return input.Skill4KeyDown && earthSkill3 == 1;
-	// 	}
-	// }
-	bool CanSkill5
-	{
-		get
-		{
-			return input.Skill5KeyDown;
 		}
 	}
 	float myFaceDir

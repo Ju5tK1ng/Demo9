@@ -15,7 +15,7 @@ public class SkillCoolDown : MonoBehaviour {
     private float coolDownTime;
     private float coolDownTimer;
     private float nextReadyTime;
-    private float skillTimer;
+    private float skillTimer;   // 2型用作持续计时，3型用作按下计时
     public bool coolDownComplete;
 
 
@@ -78,6 +78,27 @@ public class SkillCoolDown : MonoBehaviour {
                             CDTriggered();
                         }
                         skill.TriggerSkill();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else if (Input.GetKey(skillButton))
+            {
+                switch (skill.skillType)
+                {
+                    // SpaceSkill3型
+                    case 3:
+                        if (skill.skillTime == 1)
+                        {
+                            skillTimer += Time.deltaTime;
+                            if (skillTimer > 1f)
+                            {
+                                skill.skillTime = 2;
+                                skillTimer = 0;
+                                skill.TriggerSkill();
+                            }
+                        }
                         break;
                     default:
                         break;

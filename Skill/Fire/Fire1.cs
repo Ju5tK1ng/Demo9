@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Fire1Trigger : MonoBehaviour
+public class Fire1 : MonoBehaviour
 {
-    private float fireSpeed = 40f;
+    private float fireSpeed = 36f;
     private float existTime = 0.5f;
     public float damage;
     public float skillDir;
