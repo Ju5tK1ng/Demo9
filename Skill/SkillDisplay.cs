@@ -34,6 +34,10 @@ public class SkillDisplay : MonoBehaviour
             skill.GetSkill();
             skillLevelText.text = "Lv:" + skill.skillLevel.ToString();
             darkMask.gameObject.SetActive(false);
+            if (skill.skillType == 0)
+            {
+                skill.TriggerSkill();
+            }
         }
     }
 }

@@ -28,7 +28,7 @@ public class PlayerControl3 : MonoBehaviour
 	private int enemyLayerMask;
 	private int curFrame = 0;
 	private float curTime = 0;
-	private float airJumps;
+	public int airJumps = 1;
 	private float varJumpTimer;
 	private float jumpGraceTimer;
     private float jumpBufferTimer;
@@ -36,11 +36,8 @@ public class PlayerControl3 : MonoBehaviour
 	private float dashes;
 	private float dashTimer;
 	private float dashCoolDownTimer;
-	// private float skill1CoolDown = 1f;
-	// private float skill1CoolDownTimer;
-	// public Transform prefabSkill1;
-	private bool skill2 = true;
-	private float skill2Damage = 1f;
+	public bool spaceSkill1 = false;
+	public float spaceSkill1Damage = 0f;
 	private int skill3 = 1;
 	private bool skill4 = false;
 	public Transform prefabSkill4;
@@ -130,10 +127,6 @@ public class PlayerControl3 : MonoBehaviour
 		{
 			Jump();
 		}
-		// if (CanSkill1)
-		// {
-		// 	Skill1();
-		// }
 		if (CanSkill3)
 		{
 			Skill3();
@@ -170,10 +163,6 @@ public class PlayerControl3 : MonoBehaviour
 		{
 			dashCoolDownTimer -= Time.deltaTime;
 		}
-		// if (skill1CoolDownTimer > 0)
-		// {
-		// 	skill1CoolDownTimer -= Time.deltaTime;
-		// }
 		if (varJumpTimer > 0)
 		{
 			varJumpTimer -= Time.deltaTime;
@@ -221,7 +210,10 @@ public class PlayerControl3 : MonoBehaviour
 		{
 			airJumps = 1;
 			dashes = 1;
-			downEnemyBox.collider.GetComponent<Enemy>().TakeDamage(skill2Damage);
+			if (spaceSkill1)
+			{
+				downEnemyBox.collider.GetComponent<Enemy>().TakeDamage(spaceSkill1Damage);
+			}
 			Jump();
 		}
 		else if (onGround)
@@ -341,13 +333,6 @@ public class PlayerControl3 : MonoBehaviour
 		}
 		playState = PlayState.Dash;
 	}
-
-	// void Skill1()
-	// {
-	// 	skill1CoolDownTimer = skill1CoolDown;
-	// 	Transform skill1 = Instantiate(prefabSkill1, transform.position, Quaternion.identity);
-	// 	skill1.rotation = Quaternion.Euler(0, 0, -myFaceDir * 90f + 90f);
-	// }
 
 	void Skill3()
 	{
@@ -495,7 +480,7 @@ public class PlayerControl3 : MonoBehaviour
 	{
 		get
 		{
-			return onEnemy && skill2;
+			return onEnemy;
 		}
 	}
 	// bool CanSkill1

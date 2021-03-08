@@ -12,6 +12,7 @@ public abstract class Skill : ScriptableObject
     public int skillLevel;
     public int maxSkillLevel;
     public int isAdded;
+    public int skillType;
     public abstract void Initialize();
     public abstract void TriggerSkill();
     public abstract bool CheckSkill();

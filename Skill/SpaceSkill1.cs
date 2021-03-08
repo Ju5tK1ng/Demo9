@@ -3,34 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[CreateAssetMenu (menuName = "Skill/FireSkill1")]
-public class FireSkill1 : Skill
+[CreateAssetMenu (menuName = "Skill/SpaceSkill1")]
+public class SpaceSkill1 : Skill
 {
-    public float damage = 1f;
-
-    private GameObject fire1;
-    private Fire1Trigger fire1Trigger;
-    public GameObject prefabFire1;
+    public float damage;
     private GameObject playerGameObject;
-    private Transform playerTransform;
     private PlayerControl3 player;
-    private float skillDir;
 
     public override void Initialize()
     {
         playerGameObject = GameObject.FindGameObjectWithTag("Player");
-        playerTransform = playerGameObject.transform;
-        player = playerTransform.gameObject.GetComponent<PlayerControl3>();
+        player = playerGameObject.GetComponent<PlayerControl3>();
         skillLevel = 0;
         isAdded = 0;
     }
 
     public override void TriggerSkill()
     {
-        fire1 = Instantiate(prefabFire1, playerTransform.position, Quaternion.identity);
-        fire1Trigger = fire1.GetComponent<Fire1Trigger>();
-        fire1Trigger.damage = damage;
-        fire1Trigger.skillDir = Mathf.Sign(playerTransform.localScale.x);;
+        player.spaceSkill1 = true;
+        player.spaceSkill1Damage = damage;
     }
     
     // 检测能否学习技能
