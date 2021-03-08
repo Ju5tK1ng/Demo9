@@ -38,10 +38,7 @@ public class PlayerControl3 : MonoBehaviour
 	private float dashCoolDownTimer;
 	public bool spaceSkill1 = false;
 	public float spaceSkill1Damage = 0f;
-	private int skill3 = 1;
-	private bool skill4 = false;
-	public Transform prefabSkill4;
-	private Transform playerShadow;
+	public int earthSkill3 = 1;
 	public Transform prefabSkill5;
 
 	//属性
@@ -114,7 +111,7 @@ public class PlayerControl3 : MonoBehaviour
 		// 	Debug.Log(curFrame + " " + curTime + " " + transform.position.y);
 		// if (onEnemy)
 		// 	Debug.Log(curFrame + " " + curTime + " " + transform.position.y);
-		RayCastBox(skill3);
+		RayCastBox(earthSkill3);
 		SwitchAnimation();
         HorizontalMove();
         myRigidbody2D.MovePosition(transform.position + myVelocity * Time.deltaTime);
@@ -126,14 +123,6 @@ public class PlayerControl3 : MonoBehaviour
 		if (CanJump)
 		{
 			Jump();
-		}
-		if (CanSkill3)
-		{
-			Skill3();
-		}
-		if (CanSkill4)
-		{
-			Skill4();
 		}
 		if (CanSkill5)
 		{
@@ -232,7 +221,7 @@ public class PlayerControl3 : MonoBehaviour
 		{
 			Jump(wallDir);
 		}
-		if (myVelocity.y * skill3 <= 0)
+		if (myVelocity.y * earthSkill3 <= 0)
 		{
 			playState = onGround ? PlayState.Normal : PlayState.Fall;
 		}
@@ -334,9 +323,9 @@ public class PlayerControl3 : MonoBehaviour
 		playState = PlayState.Dash;
 	}
 
-	void Skill3()
+	public void EarthSkill3()
 	{
-		skill3 = -skill3;
+		earthSkill3 = -earthSkill3;
 		Vector3 scaleFlipY = transform.localScale;
 		scaleFlipY.y = -scaleFlipY.y;
 		transform.localScale = scaleFlipY;
@@ -344,23 +333,7 @@ public class PlayerControl3 : MonoBehaviour
 		WallSlideStartMax = -WallSlideStartMax;
 		JumpSpeed = -JumpSpeed;
 	}
-	void Skill4()
-	{
-		if (skill4 == false)
-		{
-			skill4 = true;
-			playerShadow = Instantiate(prefabSkill4, transform.position, Quaternion.identity);
-		}
-		else
-		{
-			Vector3 tPosition = transform.position;
-			transform.position = playerShadow.position;
-			playerShadow.position = tPosition;
-			Vector3 tLocalScale = transform.localScale;
-			transform.localScale = playerShadow.localScale;
-			playerShadow.localScale = tLocalScale;
-		}
-	}
+
 	void Skill5()
 	{
 		Vector3 tPosition = transform.position;
@@ -483,27 +456,13 @@ public class PlayerControl3 : MonoBehaviour
 			return onEnemy;
 		}
 	}
-	// bool CanSkill1
+	// bool CanSkill4
 	// {
 	// 	get
 	// 	{
-	// 		return input.Skill1KeyDown && skill1CoolDownTimer <= 0;
+	// 		return input.Skill4KeyDown && earthSkill3 == 1;
 	// 	}
 	// }
-	bool CanSkill3
-	{
-		get
-		{
-			return input.Skill3KeyDown;
-		}
-	}
-	bool CanSkill4
-	{
-		get
-		{
-			return input.Skill4KeyDown && skill3 == 1;
-		}
-	}
 	bool CanSkill5
 	{
 		get

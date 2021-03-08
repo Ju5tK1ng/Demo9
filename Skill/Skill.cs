@@ -13,6 +13,7 @@ public abstract class Skill : ScriptableObject
     public int maxSkillLevel;
     public int isAdded;
     public int skillType;
+    public int skillTime;   // 2型表示持续时间，3型用于判断是否开启
     public abstract void Initialize();
     public abstract void TriggerSkill();
     public abstract bool CheckSkill();

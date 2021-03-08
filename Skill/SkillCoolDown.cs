@@ -15,6 +15,7 @@ public class SkillCoolDown : MonoBehaviour {
     private float coolDownTime;
     private float coolDownTimer;
     private float nextReadyTime;
+    private float skillTimer;
     public bool coolDownComplete;
 
 
@@ -29,6 +30,7 @@ public class SkillCoolDown : MonoBehaviour {
         // SkillSource = GetComponent<AudioSource> ();
         skillIcon.sprite = skill.sSprite;
         coolDownTime = skill.sCoolDown;
+        skillTimer = 0;
         SkillReady ();
     }
 
@@ -40,9 +42,69 @@ public class SkillCoolDown : MonoBehaviour {
             SkillReady ();
             if (Input.GetKeyDown(skillButton)) 
             {
-                ButtonTriggered ();
+                switch (skill.skillType)
+                {
+                // 触发型
+                case 1:
+                    CDTriggered ();
+                    skill.TriggerSkill();
+                    break;
+                // 切换型
+                case 2:
+                    if (skillTimer == 0)
+                    {
+                        skillTimer = skill.skillTime;
+                        skill.TriggerSkill();
+                    }
+                    else if (skillTimer > 0)
+                    {
+                        skillTimer = 0;
+                        CDTriggered();
+                        skill.TriggerSkill();
+                    }
+                    break;
+                default:
+                    break;
+                }
             }
-        } else 
+            else if (Input.GetKeyUp(skillButton))
+            {
+                switch (skill.skillType)
+                {
+                    // SpaceSkill3型
+                    case 3:
+                        if (skill.skillTime == 1)
+                        {
+                            CDTriggered();
+                        }
+                        skill.TriggerSkill();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                switch (skill.skillType)
+                {
+                    case 2:
+                        if (skillTimer > 0)
+                        {
+                            skillTimer -= Time.deltaTime;
+                        }
+                        else if (skillTimer < 0)
+                        {
+                            skillTimer = 0;
+                            CDTriggered ();
+                            skill.TriggerSkill();
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        else 
         {
             CoolDown();
         }
@@ -68,7 +130,7 @@ public class SkillCoolDown : MonoBehaviour {
         darkMask.fillAmount = (coolDownTimer / coolDownTime);
     }
 
-    private void ButtonTriggered()
+    private void CDTriggered()
     {
         nextReadyTime = coolDownTime + Time.time;
         coolDownTimer = coolDownTime;
@@ -76,6 +138,5 @@ public class SkillCoolDown : MonoBehaviour {
         coolDownText.enabled = true;
         // SkillSource.clip = Skill.aSound;
         // SkillSource.Play ();
-        skill.TriggerSkill ();
     }
 }
