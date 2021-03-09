@@ -11,7 +11,7 @@ public class Fire1 : MonoBehaviour
 
     void Start()
     {
-        transform.rotation = Quaternion.Euler(0, 0, skillDir * 90f + 90f);
+        GetComponent<SpriteRenderer>().flipX = skillDir > 0 ? true : false;
         Invoke("Remove", existTime);
     }
 

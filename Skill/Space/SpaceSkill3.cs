@@ -29,6 +29,7 @@ public class SpaceSkill3 : Skill
 		{
 			skillTime = 1;
 			playerShadow = Instantiate(prefabShadow, playerTransform.position, Quaternion.identity);
+            playerShadow.GetComponent<SpriteRenderer>().flipX = playerTransform.localScale.x > 0 ? false : true;
 		}
 		else if (skillTime == 1)
 		{
