@@ -20,7 +20,7 @@ public class CameraMove : MonoBehaviour
         sceneY = Mathf.RoundToInt(player.position.y / 22.5f);
         Vector3 newPosition = this.transform.position;
         newPosition.x = PlayerControl3.Approach(newPosition.x, sceneX * 40f, MoveSpeed * Time.deltaTime);
-        newPosition.y = PlayerControl3.Approach(newPosition.y, sceneY * 22.5f, MoveSpeed * Time.deltaTime);
+        newPosition.y = PlayerControl3.Approach(newPosition.y, sceneY * 22f, MoveSpeed * Time.deltaTime);
         this.transform.position = newPosition;
     }
 }
