@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
-[CreateAssetMenu (menuName = "Skill/FireSkill4")]
-public class FireSkill4 : Skill
+[CreateAssetMenu (menuName = "Skill/EarthSkill4")]
+public class EarthSkill4 : Skill
 {
-    public Transform prefabFire4;
+    private GameObject createTilemap;
     private GameObject playerGameObject;
     private Transform playerTransform;
     private PlayerControl3 player;
@@ -16,6 +17,7 @@ public class FireSkill4 : Skill
         playerGameObject = GameObject.FindGameObjectWithTag("Player");
         playerTransform = playerGameObject.transform;
         player = playerGameObject.GetComponent<PlayerControl3>();
+        createTilemap = GameObject.FindGameObjectWithTag("CreateTilemap");
         skillLevel = 0;
         isAdded = 0;
     }
@@ -39,7 +41,7 @@ public class FireSkill4 : Skill
 		}
 		tPosition.x = Mathf.Round(tPosition.x + 0.5f) - 0.5f;
 		tPosition.y = Mathf.Round(tPosition.y + 0.5f) - 0.5f;
-		Transform skill5 = Instantiate(prefabFire4, tPosition, Quaternion.identity);
+        createTilemap.GetComponent<CreateTile>().CreateOneTile(tPosition);
     }
     
     // 检测能否学习技能

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class DestroyTile : MonoBehaviour
+public class CreateTile : MonoBehaviour
 {
+    public TileBase tile;
     private Tilemap tilemap;
     private TilemapCollider2D tilemapCollider2D;
     private Vector3Int tilePositionInt;
@@ -19,15 +20,11 @@ public class DestroyTile : MonoBehaviour
         
     }
 
-    public void DestroyOneTile(Vector3 position)
+    public void CreateOneTile(Vector3 position)
     {
         Vector3 tilePosition = tilemapCollider2D.ClosestPoint(position);
         tilePositionInt = tilemap.WorldToCell(tilePosition);
-        Invoke("DestroyLater", 0.05f);
+        tilemap.SetTile(tilePositionInt, tile);
     }
     
-    void DestroyLater()
-    {
-        tilemap.SetTile(tilePositionInt, null);
-    }
 }
