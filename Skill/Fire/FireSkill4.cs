@@ -39,7 +39,7 @@ public class FireSkill4 : Skill
 		}
 		tPosition.x = Mathf.Round(tPosition.x + 0.5f) - 0.5f;
 		tPosition.y = Mathf.Round(tPosition.y + 0.5f) - 0.5f;
-		Transform skill5 = Instantiate(prefabFire4, tPosition, Quaternion.identity);
+		Instantiate(prefabFire4, tPosition, Quaternion.identity);
     }
     
     // 检测能否学习技能

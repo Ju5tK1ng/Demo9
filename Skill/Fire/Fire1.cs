@@ -32,5 +32,10 @@ public class Fire1 : MonoBehaviour
             other.GetComponent<Enemy>().TakeDamage(damage);
             Destroy(gameObject);
         }
+        else if(other.tag == "CreatedTile")
+        {
+            other.GetComponent<CreatedTile>().DamageTile(damage);
+            Destroy(gameObject);
+        }
     }
 }

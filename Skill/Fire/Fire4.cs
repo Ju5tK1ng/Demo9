@@ -22,7 +22,11 @@ public class Fire4 : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if(other.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        if(other.tag == "CreatedTile")
+        {
+            other.GetComponent<CreatedTile>().DamageTile(999f);
+        }
+        else if(other.gameObject.layer == LayerMask.NameToLayer("Ground"))
         {
             other.GetComponent<DestroyTile>().DestroyOneTile(transform.position);
         }
