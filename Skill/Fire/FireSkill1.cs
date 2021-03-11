@@ -14,7 +14,6 @@ public class FireSkill1 : Skill
     private GameObject playerGameObject;
     private Transform playerTransform;
     private PlayerControl3 player;
-    private float skillDir;
 
     public override void Initialize()
     {
@@ -30,7 +29,7 @@ public class FireSkill1 : Skill
         fire1Gameobject = Instantiate(prefabFire1, playerTransform.position, Quaternion.identity);
         fire1 = fire1Gameobject.GetComponent<Fire1>();
         fire1.damage = damage;
-        fire1.skillDir = Mathf.Sign(playerTransform.localScale.x);;
+        fire1.skillDir = Mathf.Sign(playerTransform.localScale.x);
     }
     
     // 检测能否学习技能

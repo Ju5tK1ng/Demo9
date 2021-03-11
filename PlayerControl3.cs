@@ -33,12 +33,13 @@ public class PlayerControl3 : MonoBehaviour
 	private float jumpGraceTimer;
     private float jumpBufferTimer;
 	private float wallSlideTimer;
-	private float dashes;
+	public float dashes;
 	private float dashTimer;
 	private float dashCoolDownTimer;
 	public bool spaceSkill1 = false;
 	public float spaceSkill1Damage = 0f;
 	public int earthSkill3 = 1;
+	public bool woodSkill4 = false;
 	public float v;
 	public float h;
 
@@ -216,6 +217,7 @@ public class PlayerControl3 : MonoBehaviour
 	// 跳跃状态
 	void JumpState()
 	{
+		if (woodSkill4) return;
 		if (CanWallJump)
 		{
 			Jump(wallDir);
@@ -395,7 +397,7 @@ public class PlayerControl3 : MonoBehaviour
     {
         get
 		{
-			return playState != PlayState.Dash;
+			return playState != PlayState.Dash && !woodSkill4;
 		}
     }
 	bool CanFall
@@ -409,7 +411,7 @@ public class PlayerControl3 : MonoBehaviour
 	{
 		get
 		{
-			return (input.JumpKeyDown || jumpBufferTimer > 0) && playState != PlayState.Dash && (onGround || jumpGraceTimer > 0 || airJumps > 0 && wallDir == 0);
+			return (input.JumpKeyDown || jumpBufferTimer > 0) && playState != PlayState.Dash && (onGround || jumpGraceTimer > 0 || airJumps > 0 && wallDir == 0) && !woodSkill4;
 		}
 	}
 	bool CanWallJump
@@ -423,7 +425,7 @@ public class PlayerControl3 : MonoBehaviour
 	{
 		get
 		{
-			return input.DashKeyDown && dashCoolDownTimer <= 0 && dashes > 0;
+			return input.DashKeyDown && dashCoolDownTimer <= 0 && dashes > 0 && !woodSkill4;
 		}
 	}
 	bool CanEnemyJump

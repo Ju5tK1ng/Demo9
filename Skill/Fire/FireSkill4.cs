@@ -9,7 +9,6 @@ public class FireSkill4 : Skill
     private GameObject playerGameObject;
     private Transform playerTransform;
     private PlayerControl3 player;
-    private float skillDir;
 
     public override void Initialize()
     {

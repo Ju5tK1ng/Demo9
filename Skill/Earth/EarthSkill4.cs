@@ -9,7 +9,6 @@ public class EarthSkill4 : Skill
     private GameObject playerGameObject;
     private Transform playerTransform;
     private PlayerControl3 player;
-    private float skillDir;
     private float HP = 2f;
 
     public override void Initialize()
