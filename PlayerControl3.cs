@@ -34,7 +34,7 @@ public class PlayerControl3 : MonoBehaviour
     private float jumpBufferTimer;
 	private float wallSlideTimer;
 	public float dashes;
-	private float dashTimer;
+	public float dashTimer;
 	private float dashCoolDownTimer;
 	public bool spaceSkill1 = false;
 	public float spaceSkill1Damage = 0f;
