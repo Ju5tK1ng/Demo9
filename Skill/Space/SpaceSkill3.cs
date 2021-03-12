@@ -20,18 +20,18 @@ public class SpaceSkill3 : Skill
         player = playerGameObject.GetComponent<PlayerControl3>();
         skillLevel = 0;
         isAdded = 0;
-        skillTime = 0;  // 0表示未创建阴影，1表示已创建阴影
+        skillStatus = 0;  // 0表示未创建阴影，1表示已创建阴影
     }
 
     public override void TriggerSkill()
     {
-        if (skillTime == 0)
+        if (skillStatus == 0)
 		{
-			skillTime = 1;
+			skillStatus = 1;
 			playerShadow = Instantiate(prefabShadow, playerTransform.position, Quaternion.identity);
             playerShadow.GetComponent<SpriteRenderer>().flipX = playerTransform.localScale.x > 0 ? false : true;
 		}
-		else if (skillTime == 1)
+		else if (skillStatus == 1)
 		{
 			Vector3 tPosition = playerTransform.position;
 			playerTransform.position = playerShadow.position;
@@ -50,7 +50,7 @@ public class SpaceSkill3 : Skill
         else
         {
             Destroy(playerShadow.gameObject);
-            skillTime = 0;
+            skillStatus = 0;
         }
     }
     

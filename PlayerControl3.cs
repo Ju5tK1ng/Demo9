@@ -40,6 +40,7 @@ public class PlayerControl3 : MonoBehaviour
 	public float spaceSkill1Damage = 0f;
 	public int earthSkill3 = 1;
 	public bool woodSkill4 = false;
+	public bool aiming = false;
 	public float v;
 	public float h;
 
@@ -397,7 +398,7 @@ public class PlayerControl3 : MonoBehaviour
     {
         get
 		{
-			return playState != PlayState.Dash && !woodSkill4;
+			return playState != PlayState.Dash && !woodSkill4 && !aiming;
 		}
     }
 	bool CanFall

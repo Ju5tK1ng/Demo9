@@ -63,6 +63,9 @@ public class SkillCoolDown : MonoBehaviour {
                         skill.TriggerSkill();
                     }
                     break;
+                case 4:
+                    skill.TriggerSkill();
+                    break;
                 default:
                     break;
                 }
@@ -73,10 +76,16 @@ public class SkillCoolDown : MonoBehaviour {
                 {
                     // SpaceSkill3型
                     case 3:
-                        if (skill.skillTime == 1)
+                        if (skill.skillStatus == 1)
                         {
                             CDTriggered();
                         }
+                        skill.TriggerSkill();
+                        break;
+                    // 瞄准型
+                    case 4:
+                        skill.skillStatus = 2;
+                        CDTriggered();
                         skill.TriggerSkill();
                         break;
                     default:
@@ -89,16 +98,19 @@ public class SkillCoolDown : MonoBehaviour {
                 {
                     // SpaceSkill3型
                     case 3:
-                        if (skill.skillTime == 1)
+                        if (skill.skillStatus == 1)
                         {
                             skillTimer += Time.deltaTime;
                             if (skillTimer > 1f)
                             {
-                                skill.skillTime = 2;
+                                skill.skillStatus = 2;
                                 skillTimer = 0;
                                 skill.TriggerSkill();
                             }
                         }
+                        break;
+                    case 4:
+                        skill.TriggerSkill();
                         break;
                     default:
                         break;
