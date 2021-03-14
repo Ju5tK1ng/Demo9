@@ -76,6 +76,7 @@ public class SkillCoolDown : MonoBehaviour {
                 {
                     // SpaceSkill3型
                     case 3:
+                        skillTimer = 0;
                         if (skill.skillStatus == 1)
                         {
                             CDTriggered();

@@ -29,7 +29,13 @@ public class SpaceSkill3 : Skill
 		{
 			skillStatus = 1;
 			playerShadow = Instantiate(prefabShadow, playerTransform.position, Quaternion.identity);
-            playerShadow.GetComponent<SpriteRenderer>().flipX = playerTransform.localScale.x > 0 ? false : true;
+            playerShadow.transform.localScale = playerTransform.localScale;
+            if (player.earthSkill3 == -1)
+            {
+                Vector3 scaleFlipY = playerShadow.transform.localScale;
+		        scaleFlipY.y = -scaleFlipY.y;
+                playerShadow.transform.localScale = scaleFlipY;
+            }
 		}
 		else if (skillStatus == 1)
 		{
