@@ -29,6 +29,7 @@ public class SpaceSkill3 : Skill
 		{
 			skillStatus = 1;
 			playerShadow = Instantiate(prefabShadow, playerTransform.position, Quaternion.identity);
+            player.playerShadow = playerShadow.GetComponent<PlayerShadow>();
             playerShadow.transform.localScale = playerTransform.localScale;
             if (player.earthSkill3 == -1)
             {
@@ -55,6 +56,7 @@ public class SpaceSkill3 : Skill
 		}
         else
         {
+            player.playerShadow = null;
             Destroy(playerShadow.gameObject);
             skillStatus = 0;
         }

@@ -41,10 +41,14 @@ public class PlayerControl3 : MonoBehaviour
 	public int earthSkill3 = 1;
 	public bool woodSkill4 = false;
 	public bool aiming = false;
+	public PlayerShadow playerShadow;
 	public float v;
 	public float h;
 
-	//属性
+	// buff
+	public float spaceSkill7Timer;
+
+	// 属性
 	private int myLevel;
 	public int MyLevel
 	{
@@ -173,6 +177,10 @@ public class PlayerControl3 : MonoBehaviour
         {
             jumpBufferTimer -= Time.deltaTime;
         }
+		if (spaceSkill7Timer > 0)
+		{
+			spaceSkill7Timer -= Time.deltaTime;
+		}
 	}
 	
 	# region 状态
