@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Bird : Enemy
 {
-    float health = 4f;
+    public float health = 4f;
     void Start()
     {
         

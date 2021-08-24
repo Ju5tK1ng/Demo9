@@ -5,18 +5,18 @@ using UnityEngine.UI;
 
 public class PlayerControl3 : MonoBehaviour
 {
-    public enum PlayState
-    {
-        Normal,
+	public enum PlayState
+	{
+		Normal,
 		Fall,
-        Jump,
-        Dash,
-    }
-    private InputManager3 input;
-    public Vector3 myVelocity;
+		Jump,
+		Dash,
+	}
+	private InputManager3 input;
+	public Vector3 myVelocity;
 	public PlayState playState;
 	public Text SPText;
-    private Rigidbody2D myRigidbody2D;
+	private Rigidbody2D myRigidbody2D;
 	private RaycastHit2D downBox;
 	private RaycastHit2D upBox;
 	private RaycastHit2D leftBox;
@@ -31,7 +31,7 @@ public class PlayerControl3 : MonoBehaviour
 	public int airJumps = 1;
 	private float varJumpTimer;
 	private float jumpGraceTimer;
-    private float jumpBufferTimer;
+	private float jumpBufferTimer;
 	private float wallSlideTimer;
 	public float dashes;
 	public float dashTimer;
@@ -77,9 +77,9 @@ public class PlayerControl3 : MonoBehaviour
 	}
 
 	// 常量
-    private const float MaxRunSpeed = 13.5f;
-    private const float RunAccel = 150f;
-    private const float RunReduce = 60f;
+	private const float MaxRunSpeed = 13.5f;
+	private const float RunAccel = 150f;
+	private const float RunReduce = 60f;
 	private float G = 135f;
 	// private const float HalfGThreshold = 6f;
 	private float MaxFallSpeed = 24f;
@@ -94,24 +94,24 @@ public class PlayerControl3 : MonoBehaviour
 	private const float EndDashSpeed = 24f;
 	private const float DashTime = 0.15f;
 	private const float DashCooldown = 0.2f;
-    private const float AirMult = 0.65f;
+	private const float AirMult = 0.65f;
 	private const float WallJumpHSpeed = MaxRunSpeed + JumpHBoost;
 	private const float KickWallJumpHSpeed = WallJumpHSpeed + JumpHBoost;
-	
 
-    void Start()
-    {
-        input = InputManager3.Instance;
-        myRigidbody2D = GetComponent<Rigidbody2D>();
+
+	void Start()
+	{
+		input = InputManager3.Instance;
+		myRigidbody2D = GetComponent<Rigidbody2D>();
 		myCollider = GetComponent<BoxCollider2D>();
 		myAnimator = GetComponent<Animator>();
 		groundLayerMask = LayerMask.GetMask("Ground");
 		enemyLayerMask = LayerMask.GetMask("Enemy");
 		AttributeInitialize();
-    }
+	}
 
-    void Update()
-    {
+	void Update()
+	{
 		curFrame += 1;
 		curTime += Time.deltaTime;
 		// if (transform.position.y > -5.05)
@@ -122,8 +122,8 @@ public class PlayerControl3 : MonoBehaviour
 		h = input.h;
 		RayCastBox(earthSkill3);
 		SwitchAnimation();
-        HorizontalMove();
-        myRigidbody2D.MovePosition(transform.position + myVelocity * Time.deltaTime);
+		HorizontalMove();
+		myRigidbody2D.MovePosition(transform.position + myVelocity * Time.deltaTime);
 		Timer();
 		if (CanDash)
 		{
@@ -133,22 +133,22 @@ public class PlayerControl3 : MonoBehaviour
 		{
 			Jump();
 		}
-        switch (playState)
-        {
-            case PlayState.Normal:
-                NormalState();
-                break;
-            case PlayState.Fall:
-                FallState();
-                break;
+		switch (playState)
+		{
+			case PlayState.Normal:
+				NormalState();
+				break;
+			case PlayState.Fall:
+				FallState();
+				break;
 			case PlayState.Jump:
 				JumpState();
-                break;
+				break;
 			case PlayState.Dash:
 				DashState();
-                break;
-        }
-    }
+				break;
+		}
+	}
 
 	// 计时器
 	private void Timer()
@@ -170,19 +170,19 @@ public class PlayerControl3 : MonoBehaviour
 			jumpGraceTimer -= Time.deltaTime;
 		}
 		if (input.JumpKeyDown)
-        {
-            jumpBufferTimer = JumpBufferTime;
-        }
-        else if (jumpBufferTimer > 0)
-        {
-            jumpBufferTimer -= Time.deltaTime;
-        }
+		{
+			jumpBufferTimer = JumpBufferTime;
+		}
+		else if (jumpBufferTimer > 0)
+		{
+			jumpBufferTimer -= Time.deltaTime;
+		}
 		if (spaceSkill7Timer > 0)
 		{
 			spaceSkill7Timer -= Time.deltaTime;
 		}
 	}
-	
+
 	# region 状态
 	// 陆地状态
 	void NormalState()
@@ -252,7 +252,7 @@ public class PlayerControl3 : MonoBehaviour
 		{
 			dashTimer -= Time.deltaTime;
 		}
-		else 
+		else
 		{
 			myVelocity.x = EndDashSpeed * myFaceDir;
 			if(onGround)
@@ -269,7 +269,7 @@ public class PlayerControl3 : MonoBehaviour
 
 	# region 动作
 	// 落下
-    void Fall()
+	void Fall()
 	{
 		if (CanFall)
 		{
@@ -374,8 +374,8 @@ public class PlayerControl3 : MonoBehaviour
 	{
 		get
 		{
-			return downBox.collider != null ? true : false; 
-		} 
+			return downBox.collider != null ? true : false;
+		}
 	}
 	private bool onEnemy
 	{
@@ -403,12 +403,12 @@ public class PlayerControl3 : MonoBehaviour
 		}
 	}
 	bool CanMove
-    {
-        get
+	{
+		get
 		{
 			return playState != PlayState.Dash && !woodSkill4 && !aiming;
 		}
-    }
+	}
 	bool CanFall
 	{
 		get
@@ -451,37 +451,37 @@ public class PlayerControl3 : MonoBehaviour
 			return Mathf.Sign(transform.localScale.x);
 		}
 	}
-	
+
 	void RayCastBox(int HDir)
-    {
-        rightBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.right, 0.1f, groundLayerMask);
-        leftBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.left, 0.1f, groundLayerMask);
-        upBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.up * HDir, 0.1f, groundLayerMask);
-        downBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.down * HDir, 0.1f, groundLayerMask);
+	{
+		rightBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.right, 0.1f, groundLayerMask);
+		leftBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.left, 0.1f, groundLayerMask);
+		upBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.up * HDir, 0.1f, groundLayerMask);
+		downBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.down * HDir, 0.1f, groundLayerMask);
 		downEnemyBox = Physics2D.BoxCast(transform.position, myCollider.size * 1f, 0, Vector2.down * HDir, 0.1f, enemyLayerMask);
-    }
+	}
 	#endregion
 
-    public static float Approach(float curValue, float tarValue, float deltaValue)
-    {
-        if (curValue < tarValue)
-        {
-            curValue += deltaValue;
-            if (curValue > tarValue)
-            {
-                curValue = tarValue;
-            }
-        }
-        else if (curValue > tarValue)
-        {
-            curValue -= deltaValue;
-            if (curValue < tarValue)
-            {
-                curValue = tarValue;
-            }
-        }
-        return curValue;
-    }
+	public static float Approach(float curValue, float tarValue, float deltaValue)
+	{
+		if (curValue < tarValue)
+		{
+			curValue += deltaValue;
+			if (curValue > tarValue)
+			{
+				curValue = tarValue;
+			}
+		}
+		else if (curValue > tarValue)
+		{
+			curValue -= deltaValue;
+			if (curValue < tarValue)
+			{
+				curValue = tarValue;
+			}
+		}
+		return curValue;
+	}
 
 	void SwitchAnimation()
 	{
@@ -493,61 +493,61 @@ public class PlayerControl3 : MonoBehaviour
 			transform.localScale = newScale;
 		}
 		switch (playState)
-        {
-            case PlayState.Normal:
+		{
+			case PlayState.Normal:
 				if (myVelocity.x == 0)
 				{
 					myAnimator.SetInteger("state", 0);
 				}
-                else
+				else
 				{
 					myAnimator.SetInteger("state", 1);
 				}
-                break;
+				break;
 			case PlayState.Fall:
-                myAnimator.SetInteger("state", 2);
-                break;
+				myAnimator.SetInteger("state", 2);
+				break;
 			case PlayState.Jump:
-                myAnimator.SetInteger("state", 3);
-                break;
+				myAnimator.SetInteger("state", 3);
+				break;
 			case PlayState.Dash:
-                myAnimator.SetInteger("state", 4);
-                break;
-        }
+				myAnimator.SetInteger("state", 4);
+				break;
+		}
 	}
 
 	// void OnDrawGizmos()
-    // {
-    //     Gizmos.color = Color.red;
+	// {
+	//	 Gizmos.color = Color.red;
 
-    //     //Check if there has been a hit yet
-    //     if (downBox)
-    //     {
-    //         //Draw a Ray forward from GameObject toward the hit
-    //         Gizmos.DrawRay(transform.position, transform.forward * 0.1f);
-    //         //Draw a cube that extends to where the hit exists
-    //         Gizmos.DrawWireCube(transform.position + transform.forward * 0.1f, myCollider.size * 1);
-    //     }
-    //     //If there hasn't been a hit yet, draw the ray at the maximum distance
-    //     else
-    //     {
-    //         //Draw a Ray forward from GameObject toward the maximum distance
-    //         Gizmos.DrawRay(transform.position, transform.forward * 0.1f);
-    //         //Draw a cube at the maximum distance
-    //         Gizmos.DrawWireCube(transform.position + transform.forward * 0.1f, myCollider.size * 1);
-    //     }
-    // }
+	//	 //Check if there has been a hit yet
+	//	 if (downBox)
+	//	 {
+	//		 //Draw a Ray forward from GameObject toward the hit
+	//		 Gizmos.DrawRay(transform.position, transform.forward * 0.1f);
+	//		 //Draw a cube that extends to where the hit exists
+	//		 Gizmos.DrawWireCube(transform.position + transform.forward * 0.1f, myCollider.size * 1);
+	//	 }
+	//	 //If there hasn't been a hit yet, draw the ray at the maximum distance
+	//	 else
+	//	 {
+	//		 //Draw a Ray forward from GameObject toward the maximum distance
+	//		 Gizmos.DrawRay(transform.position, transform.forward * 0.1f);
+	//		 //Draw a cube at the maximum distance
+	//		 Gizmos.DrawWireCube(transform.position + transform.forward * 0.1f, myCollider.size * 1);
+	//	 }
+	// }
 
-    void HorizontalMove()
-    {
-        // 蹲下暂未实现
-        if (CanMove)
-        {
-            float mult = onGround ? 1 : AirMult;
-            if (Mathf.Abs(myVelocity.x) > MaxRunSpeed && Mathf.Sign(myVelocity.x) == input.moveDir)
-                myVelocity.x = Approach(myVelocity.x, MaxRunSpeed * input.moveDir, RunReduce * mult * Time.deltaTime);  //Reduce back from beyond the max speed
-            else
-                myVelocity.x = Approach(myVelocity.x, MaxRunSpeed * input.moveDir, RunAccel * mult * Time.deltaTime);   //Approach the max speed
+	void HorizontalMove()
+	{
+		// 蹲下暂未实现
+		if (CanMove)
+		{
+			float mult = onGround ? 1 : AirMult;
+			if (Mathf.Abs(myVelocity.x) > MaxRunSpeed && Mathf.Sign(myVelocity.x) == input.moveDir)
+				myVelocity.x = Approach(myVelocity.x, MaxRunSpeed * input.moveDir, RunReduce * mult * Time.deltaTime);  //Reduce back from beyond the max speed
+			else
+				myVelocity.x = Approach(myVelocity.x, MaxRunSpeed * input.moveDir, RunAccel * mult * Time.deltaTime);   //Approach the max speed
 		}
-    }
+	}
 }
